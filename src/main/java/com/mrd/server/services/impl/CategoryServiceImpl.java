@@ -21,8 +21,10 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = new Category();
         category.setName(categoryDto.getName());
         category.setDescription(categoryDto.getDescription());
+
         byte[] imageData = categoryDto.getImageFile().getBytes();
         category.setImage(imageData);
+
         return categoryRepository.save(category).getDto();
     }
 

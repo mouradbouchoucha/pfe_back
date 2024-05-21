@@ -1,10 +1,13 @@
 package com.mrd.server.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.mrd.server.dto.TrainerDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -26,6 +29,10 @@ public class Trainer {
     @Lob
     @Column(columnDefinition = "LONGBLOB",length = 1000000000)
     private byte[] profilePicture;
+
+    @OneToMany(mappedBy = "trainer")
+    @JsonManagedReference
+    private List<Schedule> schedules;
 
     public TrainerDto getDto(){
         TrainerDto trainerDto = new TrainerDto();

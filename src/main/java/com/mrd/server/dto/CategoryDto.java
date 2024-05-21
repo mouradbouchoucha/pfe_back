@@ -10,5 +10,6 @@ public class CategoryDto {
     private String name;
     private String description;
     private byte[] image;
+
     private MultipartFile imageFile;
 }

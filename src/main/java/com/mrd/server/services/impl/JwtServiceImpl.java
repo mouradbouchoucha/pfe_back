@@ -1,11 +1,14 @@
 package com.mrd.server.services.impl;
 
+import com.mrd.server.models.User;
+import com.mrd.server.repositories.UserRepository;
 import com.mrd.server.services.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,9 @@ public class JwtServiceImpl implements JwtService {
 
     private final long expirationTime = 1000 * 60 * 60;
     public String generateToken(UserDetails userDetails) {
+
+        User user = (User) userDetails;
+
         List<String> authorities = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
@@ -29,6 +35,7 @@ public class JwtServiceImpl implements JwtService {
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .claim("roles", authorities)
+                .claim("name", user.getName())
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
