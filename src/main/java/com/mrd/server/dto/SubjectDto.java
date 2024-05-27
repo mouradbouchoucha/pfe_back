@@ -3,11 +3,8 @@ package com.mrd.server.dto;
 import lombok.Data;
 
 @Data
-public class ResourceDto {
+public class SubjectDto {
 
     private Long id;
     private String name;
-    private boolean available;
-    private String location;
-
 }

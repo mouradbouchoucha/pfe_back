@@ -1,7 +1,9 @@
 package com.mrd.server.services.impl;
 
 import com.mrd.server.dto.TraineeDto;
+import com.mrd.server.models.Course;
 import com.mrd.server.models.Trainee;
+import com.mrd.server.repositories.CourseRepository;
 import com.mrd.server.repositories.TraineeRepository;
 import com.mrd.server.services.TraineeService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 public class TraineeServiceImpl implements TraineeService {
 
     private final TraineeRepository traineeRepository;
+    private final CourseRepository courseRepository;
 
     public TraineeDto createTrainee(TraineeDto traineeDto)throws IOException {
         Trainee trainee = new Trainee();
@@ -64,5 +68,35 @@ public class TraineeServiceImpl implements TraineeService {
     public List<TraineeDto> getTraineesByName(String name) {
         List<Trainee> trainees = traineeRepository.findAllByFirstNameContainingIgnoreCase(name);
         return trainees.stream().map(Trainee::getDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public TraineeDto enrollInCourse(Long traineeId, Long courseId) {
+        Optional<Trainee> traineeOptional = traineeRepository.findById(traineeId);
+        Optional<Course> courseOptional = courseRepository.findById(courseId);
+        if (traineeOptional.isPresent() && courseOptional.isPresent()) {
+            Trainee trainee = traineeOptional.get();
+            Course course = courseOptional.get();
+            trainee.getEnrolledCourses().add(course);
+            trainee = traineeRepository.save(trainee);
+
+            course.setEnrollmentCount(course.getEnrollmentCount() + 1);
+            return trainee.getDto();
+        }
+        return null;
+    }
+
+    @Override
+    public TraineeDto likeCourse(Long traineeId, Long courseId) {
+        Optional<Trainee> traineeOptional = traineeRepository.findById(traineeId);
+        Optional<Course> courseOptional = courseRepository.findById(courseId);
+        if (traineeOptional.isPresent() && courseOptional.isPresent()) {
+            Trainee trainee = traineeOptional.get();
+            Course course = courseOptional.get();
+            trainee.getLikedCourses().add(course);
+            trainee = traineeRepository.save(trainee);
+            return trainee.getDto();
+        }
+        return null;
     }
 }

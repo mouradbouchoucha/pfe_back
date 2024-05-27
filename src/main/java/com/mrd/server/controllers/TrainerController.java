@@ -49,6 +49,11 @@ public class TrainerController {
             @RequestPart(value = "profilePictureFile", required = false) MultipartFile profilePictureFile,
             @RequestPart("firstName") String firstName,
             @RequestPart("lastName") String lastName,
+            @RequestPart("institutionName") String institutionName,
+            @RequestPart("departmentName") String departmentName,
+            @RequestPart("yearsOfExperience") Integer yearsOfExperience,
+            @RequestPart("degree") String degree,
+            @RequestPart("gender") String gender,
             @RequestPart("phoneNumber") String phoneNumber,
             @RequestPart("address") String address,
             @RequestPart("city") String city

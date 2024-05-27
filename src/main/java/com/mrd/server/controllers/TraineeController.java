@@ -76,4 +76,22 @@ public class TraineeController {
         List<TraineeDto> traineesDtos = traineeService.getTraineesByName(name);
         return ResponseEntity.ok().body(traineesDtos);
     }
+
+    @PostMapping("/{traineeId}/enroll/{courseId}")
+    public ResponseEntity<TraineeDto> enrollInCourse(@PathVariable Long traineeId, @PathVariable Long courseId) {
+        TraineeDto updatedTrainee = traineeService.enrollInCourse(traineeId, courseId);
+        if (updatedTrainee != null) {
+            return ResponseEntity.ok(updatedTrainee);
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @PostMapping("/{traineeId}/like/{courseId}")
+    public ResponseEntity<TraineeDto> likeCourse(@PathVariable Long traineeId, @PathVariable Long courseId) {
+        TraineeDto updatedTrainee = traineeService.likeCourse(traineeId, courseId);
+        if (updatedTrainee != null) {
+            return ResponseEntity.ok(updatedTrainee);
+        }
+        return ResponseEntity.badRequest().build();
+    }
 }

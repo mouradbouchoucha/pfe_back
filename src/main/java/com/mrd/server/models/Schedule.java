@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -24,9 +25,17 @@ public class Schedule {
     @JsonManagedReference
     private Course course;
 
+    @OneToOne
+    private Resource resource;
+
+
+
     private LocalDateTime startDateTime;
     private int duration;
     private String location;
+
+    @OneToOne
+    private Subject subject;
 
 
     @ManyToOne

@@ -5,29 +5,30 @@ import com.mrd.server.dto.TrainerDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "trainers")
-public class Trainer {
+public class Trainer extends User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private String email;
+    private String institutionName;
+    private String departmentName;
+    private Integer yearsOfExperience;
+    private String degree;
+    private Gender gender;
     private String phoneNumber;
     private String address;
     private String city;
 
     @Lob
-    @Column(columnDefinition = "LONGBLOB",length = 1000000000)
+    @Column(columnDefinition = "LONGBLOB", length = 1000000000)
     private byte[] profilePicture;
 
     @OneToMany(mappedBy = "trainer")
@@ -36,10 +37,15 @@ public class Trainer {
 
     public TrainerDto getDto(){
         TrainerDto trainerDto = new TrainerDto();
-        trainerDto.setId(id);
-        trainerDto.setFirstName(firstName);
-        trainerDto.setLastName(lastName);
-        trainerDto.setEmail(email);
+        trainerDto.setId(getId());
+        trainerDto.setFirstName(getFirstName());
+        trainerDto.setLastName(getLastName());
+        trainerDto.setEmail(getEmail());
+        trainerDto.setInstitutionName(institutionName);
+        trainerDto.setDepartmentName(departmentName);
+        trainerDto.setYearsOfExperience(yearsOfExperience);
+        trainerDto.setDegree(degree);
+
         trainerDto.setPhoneNumber(phoneNumber);
         trainerDto.setAddress(address);
         trainerDto.setCity(city);

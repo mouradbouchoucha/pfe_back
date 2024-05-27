@@ -13,4 +13,8 @@ public interface TraineeService {
     void deleteTrainee(Long id);
     TraineeDto updateTrainee(TraineeDto traineeDto) throws IOException;
     List<TraineeDto> getTraineesByName(String name);
+
+    TraineeDto enrollInCourse(Long traineeId, Long courseId);
+
+    TraineeDto likeCourse(Long traineeId, Long courseId);
 }

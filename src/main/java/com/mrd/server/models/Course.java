@@ -39,6 +39,8 @@ public class Course {
     @JsonBackReference
     private Category category;
 
+    private int enrollmentCount;
+
     public CourseDto getDto(){
         CourseDto courseDto = new CourseDto();
         courseDto.setId(id);

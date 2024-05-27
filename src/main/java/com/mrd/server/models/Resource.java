@@ -19,27 +19,19 @@ public class Resource {
     private Long id;
 
     private String name;
-    private String type;
+    private String location;
     private boolean available;
-    private String url;
 
 
 
-    @ManyToMany
-    @JoinTable(
-            name = "schedule_resource",
-            joinColumns = @JoinColumn(name = "resource_id"),
-            inverseJoinColumns = @JoinColumn(name = "schedule_id")
-    )
-    private List<Schedule> schedules;
+
 
     public ResourceDto getDto(){
         ResourceDto resourceDto = new ResourceDto();
         resourceDto.setId(id);
         resourceDto.setName(name);
-        resourceDto.setType(type);
+        resourceDto.setLocation(location);
         resourceDto.setAvailable(available);
-        resourceDto.setUrl(url);
         return resourceDto;
     }
 }

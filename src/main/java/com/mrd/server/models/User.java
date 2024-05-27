@@ -11,19 +11,27 @@ import java.util.List;
 
 @Data
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "users")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String firstName;
+
+    @Column(nullable = false)
     private String lastName;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    @Enumerated(EnumType.STRING)
     private Role role;
-//    @Lob
-//    @Column(columnDefinition = "LONGBLOB",length = 1000000000)
-//    private byte[] profilePicture;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -36,7 +44,7 @@ public class User implements UserDetails {
     }
 
     public String getName(){
-        return firstName ;
+        return firstName;
     }
 
     @Override

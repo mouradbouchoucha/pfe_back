@@ -24,6 +24,11 @@ public class TrainerServiceImpl implements TrainerService {
         trainer.setFirstName(trainerDto.getFirstName());
         trainer.setLastName(trainerDto.getLastName());
         trainer.setEmail(trainerDto.getEmail());
+        trainer.setInstitutionName(trainerDto.getInstitutionName());
+        trainer.setDepartmentName(trainerDto.getDepartmentName());
+        trainer.setYearsOfExperience(trainerDto.getYearsOfExperience());
+        trainer.setDegree(trainerDto.getDegree());
+        trainer.setGender(trainerDto.getGender());
         trainer.setPhoneNumber(trainerDto.getPhoneNumber());
         trainer.setAddress(trainerDto.getAddress());
         trainer.setCity(trainerDto.getCity());
@@ -49,6 +54,11 @@ public class TrainerServiceImpl implements TrainerService {
         trainer.setFirstName(trainerDto.getFirstName());
         trainer.setLastName(trainerDto.getLastName());
         trainer.setEmail(trainerDto.getEmail());
+        trainer.setInstitutionName(trainerDto.getInstitutionName());
+        trainer.setDepartmentName(trainerDto.getDepartmentName());
+        trainer.setYearsOfExperience(trainerDto.getYearsOfExperience());
+        trainer.setDegree(trainerDto.getDegree());
+        trainer.setGender(trainerDto.getGender());
         trainer.setPhoneNumber(trainerDto.getPhoneNumber());
         trainer.setAddress(trainerDto.getAddress());
         trainer.setCity(trainerDto.getCity());
