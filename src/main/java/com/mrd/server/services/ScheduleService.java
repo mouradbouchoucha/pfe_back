@@ -2,6 +2,7 @@ package com.mrd.server.services;
 
 import com.mrd.server.dto.ScheduleDto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ScheduleService {
@@ -11,4 +12,12 @@ public interface ScheduleService {
     void deleteSchedule(Long id);
 
     ScheduleDto updateSchedule(Long id, ScheduleDto scheduleDTO);
+
+    List<ScheduleDto> getScheduleByCourseId(Long courseId);
+
+    List<ScheduleDto> getScheduleByTrainerId(Long trainerId);
+
+    List<ScheduleDto> getScheduleByTrainerIdAndCourseId(Long trainerId, Long courseId);
+
+    ScheduleDto getScheduleByStartDateTime(LocalDateTime startDateTime);
 }

@@ -1,6 +1,5 @@
 package com.mrd.server.models;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.mrd.server.dto.TraineeDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,6 +17,7 @@ import java.util.List;
 @Table(name = "trainees")
 public class Trainee extends User {
 
+    private String profession;
     private String phoneNumber;
     private String address;
     private String city;
@@ -48,6 +48,7 @@ public class Trainee extends User {
         traineeDto.setFirstName(getFirstName());
         traineeDto.setLastName(getLastName());
         traineeDto.setEmail(getEmail());
+        traineeDto.setProfession(profession);
         traineeDto.setPhoneNumber(phoneNumber);
         traineeDto.setAddress(address);
         traineeDto.setCity(city);

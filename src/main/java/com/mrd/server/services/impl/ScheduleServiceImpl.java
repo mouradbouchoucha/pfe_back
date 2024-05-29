@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -55,5 +56,30 @@ public class ScheduleServiceImpl implements ScheduleService {
         ScheduleDto scheduleDTO = new ScheduleDto();
         BeanUtils.copyProperties(schedule, scheduleDTO);
         return scheduleDTO;
+    }
+    @Override
+    public List<ScheduleDto> getScheduleByCourseId(Long courseId) {
+        return scheduleRepository.findAllByCourseId(courseId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ScheduleDto> getScheduleByTrainerId(Long trainerId) {
+        return scheduleRepository.findAllByTrainerId(trainerId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ScheduleDto> getScheduleByTrainerIdAndCourseId(Long trainerId, Long courseId) {
+        return scheduleRepository.findByCourseIdAndTrainerId(trainerId, courseId).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ScheduleDto getScheduleByStartDateTime(LocalDateTime startDateTime) {
+        return scheduleRepository.findByStartDateTime(startDateTime).getDto();
     }
 }

@@ -1,11 +1,8 @@
 package com.mrd.server.controllers;
 
 import com.mrd.server.dto.TraineeDto;
-import com.mrd.server.dto.TrainerDto;
 import com.mrd.server.models.Trainee;
-import com.mrd.server.models.Trainer;
 import com.mrd.server.repositories.TraineeRepository;
-import com.mrd.server.repositories.TrainerRepository;
 import com.mrd.server.services.TraineeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -52,6 +49,7 @@ public class TraineeController {
             @RequestPart(value = "profilePictureFile", required = false) MultipartFile profilePictureFile,
             @RequestPart("firstName") String firstName,
             @RequestPart("lastName") String lastName,
+            @RequestPart("profession") String profession,
             @RequestPart("phoneNumber") String phoneNumber,
             @RequestPart("address") String address,
             @RequestPart("city") String city

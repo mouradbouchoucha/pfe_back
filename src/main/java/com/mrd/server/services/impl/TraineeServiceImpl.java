@@ -26,6 +26,7 @@ public class TraineeServiceImpl implements TraineeService {
         trainee.setFirstName(traineeDto.getFirstName());
         trainee.setLastName(traineeDto.getLastName());
         trainee.setEmail(traineeDto.getEmail());
+        trainee.setProfession(traineeDto.getProfession());
         trainee.setPhoneNumber(traineeDto.getPhoneNumber());
         trainee.setAddress(traineeDto.getAddress());
         trainee.setCity(traineeDto.getCity());
@@ -51,6 +52,7 @@ public class TraineeServiceImpl implements TraineeService {
         trainee.setFirstName(traineeDto.getFirstName());
         trainee.setLastName(traineeDto.getLastName());
         trainee.setEmail(traineeDto.getEmail());
+        trainee.setProfession(traineeDto.getProfession());
         trainee.setPhoneNumber(traineeDto.getPhoneNumber());
         trainee.setAddress(traineeDto.getAddress());
         trainee.setCity(traineeDto.getCity());

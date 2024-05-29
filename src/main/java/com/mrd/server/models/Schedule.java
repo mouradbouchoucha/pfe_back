@@ -31,7 +31,7 @@ public class Schedule {
 
 
     private LocalDateTime startDateTime;
-    private int duration;
+    private int duration;//in hours
     private String location;
 
     @OneToOne
