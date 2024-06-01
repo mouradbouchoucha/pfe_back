@@ -27,7 +27,7 @@ public class Course {
     private LocalDateTime startDateTime;
 
     @Lob
-    @Column(columnDefinition = "LONGBLOB",length = 1000000000)
+    @Column(columnDefinition = "LONGBLOB", length = 1000000000)
     private byte[] image;
 
     @OneToMany(mappedBy = "course")
@@ -39,9 +39,26 @@ public class Course {
     @JsonBackReference
     private Category category;
 
-    private int enrollmentCount;
 
-    public CourseDto getDto(){
+    @ManyToMany
+    @JoinTable(
+            name = "course_trainee_enrollment",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainee_id")
+    )
+    @JsonBackReference
+    private List<Trainee> enrolledTrainees;
+
+    @ManyToMany
+    @JoinTable(
+            name = "course_trainee_likes",
+            joinColumns = @JoinColumn(name = "course_id"),
+            inverseJoinColumns = @JoinColumn(name = "trainee_id")
+    )
+    @JsonBackReference
+    private List<Trainee> likedTrainees;
+
+    public CourseDto getDto() {
         CourseDto courseDto = new CourseDto();
         courseDto.setId(id);
         courseDto.setName(name);
@@ -49,8 +66,10 @@ public class Course {
         courseDto.setDuration(duration);
         courseDto.setStartDateTime(startDateTime);
         courseDto.setImage(image);
-        courseDto.setCategory_id(category.getId());
-        courseDto.setCategoryName(category.getName());
+        if (category != null) {
+            courseDto.setCategory_id(category.getId());
+            courseDto.setCategoryName(category.getName());
+        }
         return courseDto;
     }
 }

@@ -82,7 +82,6 @@ public class TraineeServiceImpl implements TraineeService {
             trainee.getEnrolledCourses().add(course);
             trainee = traineeRepository.save(trainee);
 
-            course.setEnrollmentCount(course.getEnrollmentCount() + 1);
             return trainee.getDto();
         }
         return null;

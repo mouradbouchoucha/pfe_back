@@ -1,5 +1,6 @@
 package com.mrd.server.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.mrd.server.dto.TraineeDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,23 +27,15 @@ public class Trainee extends User {
     @Column(columnDefinition = "LONGBLOB", length = 1000000000)
     private byte[] profilePicture;
 
-    @ManyToMany
-    @JoinTable(
-            name = "enrolled_courses",
-            joinColumns = @JoinColumn(name = "trainee_id"),
-            inverseJoinColumns = @JoinColumn(name = "course_id")
-    )
+    @ManyToMany(mappedBy = "enrolledTrainees")
+    @JsonManagedReference
     private List<Course> enrolledCourses;
 
-    @ManyToMany
-    @JoinTable(
-            name = "liked_courses",
-            joinColumns = @JoinColumn(name = "trainee_id"),
-            inverseJoinColumns = @JoinColumn(name = "course_id")
-    )
-    private List<Course> LikedCourses;
+    @ManyToMany(mappedBy = "likedTrainees")
+    @JsonManagedReference
+    private List<Course> likedCourses;
 
-    public TraineeDto getDto(){
+    public TraineeDto getDto() {
         TraineeDto traineeDto = new TraineeDto();
         traineeDto.setId(getId());
         traineeDto.setFirstName(getFirstName());

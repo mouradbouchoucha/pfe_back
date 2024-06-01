@@ -25,7 +25,7 @@ public class Category {
     @Column(columnDefinition = "LONGTEXT")
     private String description;
     @Lob
-    @Column(columnDefinition = "LONGBLOB",length = 1000000000)
+    @Column(columnDefinition = "LONGBLOB", length = 1000000000)
     private byte[] image;
 
     @OneToMany(mappedBy = "category")

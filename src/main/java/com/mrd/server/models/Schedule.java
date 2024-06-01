@@ -1,5 +1,6 @@
 package com.mrd.server.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.mrd.server.dto.ScheduleDto;
 import jakarta.persistence.*;
@@ -22,28 +23,25 @@ public class Schedule {
 
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
-    @JsonManagedReference
+    @JsonBackReference
     private Course course;
 
     @OneToOne
     private Resource resource;
 
-
-
     private LocalDateTime startDateTime;
-    private int duration;//in hours
+    private int duration; // in hours
     private String location;
 
     @OneToOne
     private Subject subject;
-
 
     @ManyToOne
     @JoinColumn(name = "trainer_id", nullable = false)
     @JsonManagedReference
     private Trainer trainer;
 
-    public ScheduleDto getDto(){
+    public ScheduleDto getDto() {
         ScheduleDto scheduleDto = new ScheduleDto();
         scheduleDto.setId(id);
         scheduleDto.setStartDateTime(startDateTime);
@@ -51,5 +49,4 @@ public class Schedule {
         scheduleDto.setLocation(location);
         return scheduleDto;
     }
-
 }
