@@ -3,6 +3,7 @@ package com.mrd.server.models;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.mrd.server.dto.CourseDto;
+import com.mrd.server.dto.ScheduleDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -70,6 +72,25 @@ public class Course {
             courseDto.setCategory_id(category.getId());
             courseDto.setCategoryName(category.getName());
         }
+        courseDto.setSchedules(convertToScheduleDtoList(schedules));
         return courseDto;
+    }
+    private List<ScheduleDto> convertToScheduleDtoList(List<Schedule> schedules) {
+        return schedules.stream().map(this::convertToScheduleDto).collect(Collectors.toList());
+    }
+
+    private ScheduleDto convertToScheduleDto(Schedule schedule) {
+        ScheduleDto scheduleDto = new ScheduleDto();
+        scheduleDto.setId(schedule.getId());
+
+        scheduleDto.setDuration(schedule.getDuration());
+        scheduleDto.setLocation(schedule.getLocation());
+        scheduleDto.setCourse(convertToCourseDto(schedule.getCourse()));
+        scheduleDto.setStartDateTime(schedule.getStartDateTime());
+        return scheduleDto;
+    }
+
+    private CourseDto convertToCourseDto(Course course) {
+        return new CourseDto();
     }
 }

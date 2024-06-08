@@ -28,7 +28,9 @@ public class User implements UserDetails {
     private String email;
 
     @Column(nullable = false)
-    private String password;
+    private String password = "pwd";
+
+    private boolean enabled;
 
     @Enumerated(EnumType.STRING)
     private Role role;

@@ -1,5 +1,6 @@
 package com.mrd.server.dto;
 
+import com.mrd.server.models.Resource;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -8,10 +9,13 @@ import java.time.LocalDateTime;
 public class ScheduleDto {
 
     private Long id;
-    private String name;
+
     private int duration;
     private LocalDateTime startDateTime;
+    private ResourceDto resource;
     private String location;
     private CourseDto course;
+    private TrainerDto trainer;
+    private SubjectDto subject;
 
 }

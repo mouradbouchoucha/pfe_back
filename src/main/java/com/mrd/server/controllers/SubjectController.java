@@ -16,8 +16,8 @@ import java.util.List;
 public class SubjectController {
     private final SubjectService subjectService;
 
-    @RequestMapping("/create")
-    public ResponseEntity<SubjectDto> createSubject(@RequestParam SubjectDto subjectDto) {
+    @PostMapping("/create")
+    public ResponseEntity<SubjectDto> createSubject(@RequestBody SubjectDto subjectDto) {
         SubjectDto createdSubject = subjectService.createSubject(subjectDto);
         return new ResponseEntity<>(createdSubject, HttpStatus.CREATED);
     }
@@ -40,14 +40,8 @@ public class SubjectController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<SubjectDto> updateSubject(
-            @PathVariable Long id,
-            @RequestParam String name,
-            @RequestParam String description
-    ){
-        SubjectDto subjectDto = new SubjectDto();
-        subjectDto.setId(id);
-        subjectDto.setName(name);
-        return ResponseEntity.ok(subjectService.updateSubject(id, subjectDto));
+    public ResponseEntity<SubjectDto> updateSubject(@PathVariable Long id, @RequestBody SubjectDto subjectDto) {
+        SubjectDto updatedSubject = subjectService.updateSubject(id, subjectDto);
+        return ResponseEntity.ok(updatedSubject);
     }
 }

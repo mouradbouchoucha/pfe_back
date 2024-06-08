@@ -11,4 +11,6 @@ public interface TrainerService {
     void deleteTrainer(Long id);
     TrainerDto updateTrainer(TrainerDto trainerDto) throws IOException;
     List<TrainerDto> getTrainersByName(String name);
+
+    TrainerDto getTrainerById(Long id);
 }

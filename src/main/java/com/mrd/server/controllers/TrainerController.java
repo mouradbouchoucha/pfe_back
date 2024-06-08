@@ -30,6 +30,13 @@ public class TrainerController {
         return ResponseEntity.ok().body(trainers);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<TrainerDto> getTrainerById(@PathVariable Long id) {
+
+        TrainerDto trainerDto = trainerService.getTrainerById(id);
+        return ResponseEntity.ok().body(trainerDto);
+    }
+
     @PostMapping("/create")
     public ResponseEntity<TrainerDto> createTrainer(
             @ModelAttribute TrainerDto trainerDto

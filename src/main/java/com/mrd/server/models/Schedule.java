@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -21,22 +22,22 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "course_id", nullable = false)
     @JsonBackReference
     private Course course;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private Resource resource;
 
     private LocalDateTime startDateTime;
     private int duration; // in hours
     private String location;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private Subject subject;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "trainer_id", nullable = false)
     @JsonManagedReference
     private Trainer trainer;
@@ -44,9 +45,13 @@ public class Schedule {
     public ScheduleDto getDto() {
         ScheduleDto scheduleDto = new ScheduleDto();
         scheduleDto.setId(id);
+        scheduleDto.setCourse(course.getDto());
         scheduleDto.setStartDateTime(startDateTime);
         scheduleDto.setDuration(duration);
         scheduleDto.setLocation(location);
+        scheduleDto.setSubject(subject.getDto());
+        scheduleDto.setTrainer(trainer.getDto());
+        scheduleDto.setResource(resource.getDto());
         return scheduleDto;
     }
 }

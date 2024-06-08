@@ -77,4 +77,10 @@ public class TrainerServiceImpl implements TrainerService {
         List<Trainer> trainers = trainerRepository.findAllByFirstNameContainingIgnoreCase(name);
         return trainers.stream().map(Trainer::getDto).collect(Collectors.toList());
     }
+
+    @Override
+    public TrainerDto getTrainerById(Long id) {
+        Trainer trainer = trainerRepository.findById(id)
+                .orElseThrow();
+        return trainer.getDto();}
 }

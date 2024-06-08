@@ -9,10 +9,9 @@ import java.util.Optional;
 
 public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findAllByCourseId(Long courseId);
+    List<Schedule> findAllByTrainerId(Long trainerId);
+    List<Schedule> findByCourseIdAndTrainerId(Long courseId, Long trainerId);
+    Optional<Schedule> findByStartDateTime(LocalDateTime startDateTime);
 
-    List <Schedule> findAllByTrainerId(Long trainerId);
-
-    Optional<Schedule> findByCourseIdAndTrainerId(Long courseId, Long trainerId);
-
-    Schedule findByStartDateTime(LocalDateTime startDateTime);
-    }
+    boolean existsByStartDateTime(LocalDateTime startDateTime);
+}

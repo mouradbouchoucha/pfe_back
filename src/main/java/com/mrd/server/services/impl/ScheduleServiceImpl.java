@@ -7,27 +7,33 @@ import com.mrd.server.services.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ScheduleServiceImpl implements ScheduleService {
+
     private final ScheduleRepository scheduleRepository;
 
     @Override
     public ScheduleDto createSchedule(ScheduleDto scheduleDTO) {
         Schedule schedule = new Schedule();
         BeanUtils.copyProperties(scheduleDTO, schedule);
-        return scheduleRepository.save(schedule).getDto();
+        Schedule savedSchedule = scheduleRepository.save(schedule);
+        return convertToDTO(savedSchedule);
     }
 
     @Override
     public ScheduleDto getScheduleById(Long id) {
-        return Objects.requireNonNull(scheduleRepository.findById(id).orElse(null)).getDto();
+        return scheduleRepository.findById(id)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new RuntimeException("Schedule not found for id: " + id));
     }
 
     @Override
@@ -39,24 +45,22 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public void deleteSchedule(Long id) {
+        if (!scheduleRepository.existsById(id)) {
+            throw new RuntimeException("Schedule not found for id: " + id);
+        }
         scheduleRepository.deleteById(id);
     }
 
     @Override
     public ScheduleDto updateSchedule(Long id, ScheduleDto scheduleDTO) {
-        Schedule existingSchedule = scheduleRepository.findById(id).orElse(null);
-        if (existingSchedule == null) {
-            return null; // or throw an exception
-        }
-        BeanUtils.copyProperties(scheduleDTO, existingSchedule);
-        return scheduleRepository.save(existingSchedule).getDto();
+        return scheduleRepository.findById(id)
+                .map(existingSchedule -> {
+                    BeanUtils.copyProperties(scheduleDTO, existingSchedule);
+                    return convertToDTO(scheduleRepository.save(existingSchedule));
+                })
+                .orElseThrow(() -> new RuntimeException("Schedule not found for id: " + id));
     }
 
-    private ScheduleDto convertToDTO(Schedule schedule) {
-        ScheduleDto scheduleDTO = new ScheduleDto();
-        BeanUtils.copyProperties(schedule, scheduleDTO);
-        return scheduleDTO;
-    }
     @Override
     public List<ScheduleDto> getScheduleByCourseId(Long courseId) {
         return scheduleRepository.findAllByCourseId(courseId).stream()
@@ -80,6 +84,29 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public ScheduleDto getScheduleByStartDateTime(LocalDateTime startDateTime) {
-        return scheduleRepository.findByStartDateTime(startDateTime).getDto();
+        return scheduleRepository.findByStartDateTime(startDateTime)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new RuntimeException("Schedule not found for start date and time: " + startDateTime));
+    }
+
+    private ScheduleDto convertToDTO(Schedule schedule) {
+        ScheduleDto scheduleDto = new ScheduleDto();
+        BeanUtils.copyProperties(schedule, scheduleDto);
+
+        // Manually setting nested DTOs
+        if (schedule.getCourse() != null) {
+            scheduleDto.setCourse(schedule.getCourse().getDto());
+        }
+        if (schedule.getResource() != null) {
+            scheduleDto.setResource(schedule.getResource().getDto());
+        }
+        if (schedule.getSubject() != null) {
+            scheduleDto.setSubject(schedule.getSubject().getDto());
+        }
+        if (schedule.getTrainer() != null) {
+            scheduleDto.setTrainer(schedule.getTrainer().getDto());
+        }
+
+        return scheduleDto;
     }
 }
