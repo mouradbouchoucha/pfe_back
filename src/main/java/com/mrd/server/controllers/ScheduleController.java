@@ -1,6 +1,7 @@
 package com.mrd.server.controllers;
 
 import com.mrd.server.dto.ScheduleDto;
+import com.mrd.server.dto.TrainerDto;
 import com.mrd.server.repositories.ScheduleRepository;
 import com.mrd.server.services.ScheduleService;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @CrossOrigin("*")
@@ -77,8 +80,15 @@ public class ScheduleController {
 
     @GetMapping("/exist")
     public ResponseEntity<Boolean> exist(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime) {
-        boolean exist = scheduleRepository.existsByStartDateTime(startDateTime);
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,Long courseId) {
+        boolean exist = scheduleRepository.existsByStartDateTimeAndCourseId(startDateTime, courseId);
         return ResponseEntity.ok(exist);
+    }
+
+    @GetMapping("/available-trainers")
+    public List<TrainerDto> getAvailableTrainers(
+            @RequestParam("startDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
+            @RequestParam("duration") int duration) {
+        return scheduleService.getAvailableTrainers(startDateTime, duration);
     }
 }

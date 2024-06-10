@@ -1,8 +1,10 @@
 package com.mrd.server.services;
 
 import com.mrd.server.dto.ScheduleDto;
+import com.mrd.server.dto.TrainerDto;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface ScheduleService {
@@ -20,4 +22,6 @@ public interface ScheduleService {
     List<ScheduleDto> getScheduleByTrainerIdAndCourseId(Long trainerId, Long courseId);
 
     ScheduleDto getScheduleByStartDateTime(LocalDateTime startDateTime);
+
+    List<TrainerDto> getAvailableTrainers(LocalDateTime startDateTime, int duration);
 }

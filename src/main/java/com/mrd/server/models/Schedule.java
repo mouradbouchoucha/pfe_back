@@ -9,8 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
-
 
 @Entity
 @Data
@@ -31,7 +29,8 @@ public class Schedule {
     private Resource resource;
 
     private LocalDateTime startDateTime;
-    private int duration; // in hours
+    private int duration;
+    private LocalDateTime endDateTime;
     private String location;
 
     @OneToOne(fetch = FetchType.EAGER)
@@ -41,6 +40,32 @@ public class Schedule {
     @JoinColumn(name = "trainer_id", nullable = false)
     @JsonManagedReference
     private Trainer trainer;
+
+    // Constructors, getters, and setters
+
+    public Schedule(LocalDateTime startDateTime, int duration) {
+        this.startDateTime = startDateTime;
+        this.duration = duration;
+        this.endDateTime = calculateEndDateTime();
+    }
+
+    public void setStartDateTime(LocalDateTime startDateTime) {
+        this.startDateTime = startDateTime;
+        this.endDateTime = calculateEndDateTime();  // Update endDateTime whenever startDateTime is set
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+        this.endDateTime = calculateEndDateTime();  // Update endDateTime whenever duration is set
+    }
+
+    private LocalDateTime calculateEndDateTime() {
+        if (startDateTime != null) {
+            return startDateTime.plusHours(duration);
+        } else {
+            return null;
+        }
+    }
 
     public ScheduleDto getDto() {
         ScheduleDto scheduleDto = new ScheduleDto();

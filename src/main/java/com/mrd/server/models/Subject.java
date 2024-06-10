@@ -18,12 +18,11 @@ public class Subject {
     private Long id;
     private String name;
 
-
-
-    public SubjectDto getDto() {
+    public SubjectDto getDto(){
         SubjectDto subjectDto = new SubjectDto();
         subjectDto.setId(id);
         subjectDto.setName(name);
         return subjectDto;
     }
+
 }

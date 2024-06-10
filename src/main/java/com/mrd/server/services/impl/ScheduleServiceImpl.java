@@ -1,8 +1,13 @@
 package com.mrd.server.services.impl;
 
 import com.mrd.server.dto.ScheduleDto;
+import com.mrd.server.dto.TrainerDto;
+import com.mrd.server.models.Course;
 import com.mrd.server.models.Schedule;
+import com.mrd.server.models.Trainer;
+import com.mrd.server.repositories.CourseRepository;
 import com.mrd.server.repositories.ScheduleRepository;
+import com.mrd.server.repositories.TrainerRepository;
 import com.mrd.server.services.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -10,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,11 +26,17 @@ import java.util.stream.Collectors;
 public class ScheduleServiceImpl implements ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
+    private final TrainerRepository trainerRepository;
+    private final CourseRepository courseRepository;
 
     @Override
     public ScheduleDto createSchedule(ScheduleDto scheduleDTO) {
         Schedule schedule = new Schedule();
         BeanUtils.copyProperties(scheduleDTO, schedule);
+        Course course = courseRepository.findById(scheduleDTO.getCourse().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid course ID"));
+        schedule.setCourse(course);        schedule.setStartDateTime(scheduleDTO.getStartDateTime());
+        schedule.setDuration(scheduleDTO.getDuration());
         Schedule savedSchedule = scheduleRepository.save(schedule);
         return convertToDTO(savedSchedule);
     }
@@ -56,6 +68,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleRepository.findById(id)
                 .map(existingSchedule -> {
                     BeanUtils.copyProperties(scheduleDTO, existingSchedule);
+                    existingSchedule.setStartDateTime(scheduleDTO.getStartDateTime());
+                    existingSchedule.setDuration(scheduleDTO.getDuration());
                     return convertToDTO(scheduleRepository.save(existingSchedule));
                 })
                 .orElseThrow(() -> new RuntimeException("Schedule not found for id: " + id));
@@ -93,7 +107,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         ScheduleDto scheduleDto = new ScheduleDto();
         BeanUtils.copyProperties(schedule, scheduleDto);
 
-        // Manually setting nested DTOs
         if (schedule.getCourse() != null) {
             scheduleDto.setCourse(schedule.getCourse().getDto());
         }
@@ -109,4 +122,22 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         return scheduleDto;
     }
+
+    @Override
+    public List<TrainerDto> getAvailableTrainers(LocalDateTime startDateTime, int duration) {
+        LocalDateTime endDateTime = startDateTime.plusHours(duration);
+
+        List<Trainer> allTrainers = trainerRepository.findAll();
+        List<Schedule> conflictingSchedules = scheduleRepository.findConflictingSchedules(startDateTime, endDateTime);
+
+        List<Trainer> availableTrainers = allTrainers.stream()
+                .filter(trainer -> conflictingSchedules.stream()
+                        .noneMatch(schedule -> schedule.getTrainer().getId().equals(trainer.getId())))
+                .collect(Collectors.toList());
+
+        return availableTrainers.stream()
+                .map(Trainer::getDto)
+                .collect(Collectors.toList());
+    }
+
 }

@@ -1,5 +1,7 @@
 package com.mrd.server.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.mrd.server.config.CustomLocalDateTimeDeserializer;
 import com.mrd.server.models.Resource;
 import lombok.Data;
 
@@ -11,6 +13,7 @@ public class ScheduleDto {
     private Long id;
 
     private int duration;
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
     private LocalDateTime startDateTime;
     private ResourceDto resource;
     private String location;
