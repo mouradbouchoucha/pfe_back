@@ -23,5 +23,5 @@ public interface ScheduleService {
 
     ScheduleDto getScheduleByStartDateTime(LocalDateTime startDateTime);
 
-    List<TrainerDto> getAvailableTrainers(LocalDateTime startDateTime, int duration);
+    List<TrainerDto> getAvailableTrainers(LocalDateTime startDateTime, double duration);
 }

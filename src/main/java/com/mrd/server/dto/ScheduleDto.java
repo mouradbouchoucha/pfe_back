@@ -12,8 +12,8 @@ public class ScheduleDto {
 
     private Long id;
 
-    private int duration;
-    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    private double duration;
+//    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
     private LocalDateTime startDateTime;
     private ResourceDto resource;
     private String location;

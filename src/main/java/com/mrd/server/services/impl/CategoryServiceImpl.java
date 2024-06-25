@@ -17,6 +17,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
 
+    @Override
     public CategoryDto createCategory(CategoryDto categoryDto)throws IOException {
         Category category = new Category();
         category.setName(categoryDto.getName());
@@ -59,6 +60,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     public List<CategoryDto> getCategoriesByName(String name) {
+        if(name == null || name.isEmpty()) {
+            return getAllCategories();
+        }
         List<Category> categories = categoryRepository.findAllByNameContainingIgnoreCase(name);
         return categories.stream().map(Category::getDto).collect(Collectors.toList());
     }

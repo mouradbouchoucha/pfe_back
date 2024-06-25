@@ -1,67 +1,60 @@
 package com.mrd.server.controllers;
 
-import com.mrd.server.dto.CategoryDto;
 import com.mrd.server.dto.CourseDto;
 import com.mrd.server.services.CourseService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/courses")
-@RequiredArgsConstructor
 public class CourseController {
 
-    private final CourseService courseService;
+    @Autowired
+    private CourseService courseService;
 
-    @PostMapping("/create")
-    public ResponseEntity<CourseDto> createCourse(@ModelAttribute CourseDto courseDto) throws IOException {
-        CourseDto createdCourse = courseService.createCourse(courseDto);
-        return new ResponseEntity<>(createdCourse, HttpStatus.CREATED);
-    }
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
-    @GetMapping("/course/{id}")
-    public ResponseEntity<CourseDto> getCourseById(@PathVariable Long id) {
-        CourseDto courseDto = courseService.getCourseById(id);
-        System.out.println(courseDto);
-        return courseDto != null ? ResponseEntity.ok(courseDto) : ResponseEntity.notFound().build();
-    }
-
-    @GetMapping("/all")
-    public ResponseEntity<List<CourseDto>> getAllCourses() {
-        List<CourseDto> courses = courseService.getAllCourses();
-        return ResponseEntity.ok(courses);
-    }
-
-    @PutMapping("/update/{id}")
-    public ResponseEntity<CourseDto> updateCourse(
-            @PathVariable Long id,
-            @RequestPart("name") String name,
-            @RequestPart("description") String description,
-            @RequestPart("duration") int duration,
-            @RequestPart("startDateTime") LocalDateTime startDateTime,
-            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
-            ) throws IOException {
-
+    @PostMapping
+    public ResponseEntity<CourseDto> createCourse(@RequestParam("name") String name,
+                                                  @RequestParam("description") String description,
+                                                  @RequestParam("duration") int duration,
+                                                  @RequestParam("startDateTime") String startDateTime,
+                                                  @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
         CourseDto courseDto = new CourseDto();
-
-        courseDto.setId(id);
         courseDto.setName(name);
         courseDto.setDescription(description);
         courseDto.setDuration(duration);
-        courseDto.setStartDateTime(startDateTime);
+
+        try {
+            courseDto.setStartDateTime(LocalDateTime.parse(startDateTime, DATE_TIME_FORMATTER));
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
         courseDto.setImageFile(imageFile);
 
-        CourseDto updatedCourse = courseService.updateCourse(id, courseDto);
-        return updatedCourse != null ? ResponseEntity.ok(updatedCourse) : ResponseEntity.notFound().build();
+        CourseDto createdCourse = courseService.createCourse(courseDto);
+        return ResponseEntity.ok(createdCourse);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CourseDto> getCourseById(@PathVariable Long id) {
+        CourseDto course = courseService.getCourseById(id);
+        return ResponseEntity.ok(course);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CourseDto>> getAllCourses() {
+        List<CourseDto> courses = courseService.getAllCourses();
+        return ResponseEntity.ok(courses);
     }
 
     @DeleteMapping("/{id}")
@@ -70,9 +63,35 @@ public class CourseController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search/{name}")
-    public ResponseEntity<List<CourseDto>> getCourseByName(@PathVariable String name) {
-        List<CourseDto> coursesDtos = courseService.getCourseByName(name);
-        return ResponseEntity.ok().body(coursesDtos);
+    @GetMapping("/search")
+    public ResponseEntity<List<CourseDto>> getCoursesByName(@RequestParam("name") String name) {
+        List<CourseDto> courses = courseService.getCourseByName(name);
+        return ResponseEntity.ok(courses);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CourseDto> updateCourse(@PathVariable Long id,
+                                                  @RequestParam("name") String name,
+                                                  @RequestParam("description") String description,
+                                                  @RequestParam("duration") int duration,
+                                                  @RequestParam("startDateTime") String startDateTime,
+                                                  @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+        CourseDto courseDto = new CourseDto();
+        courseDto.setId(id);
+        courseDto.setName(name);
+        courseDto.setDescription(description);
+        courseDto.setDuration(duration);
+
+        try {
+            courseDto.setStartDateTime(LocalDateTime.parse(startDateTime, DATE_TIME_FORMATTER));
+        } catch (DateTimeParseException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        courseDto.setImageFile(imageFile);
+
+        CourseDto updatedCourse = courseService.updateCourse(courseDto);
+        return ResponseEntity.ok(updatedCourse);
     }
 }
+

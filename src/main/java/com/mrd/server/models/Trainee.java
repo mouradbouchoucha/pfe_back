@@ -3,10 +3,7 @@ package com.mrd.server.models;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.mrd.server.dto.TraineeDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -29,10 +26,14 @@ public class Trainee extends User {
 
     @ManyToMany(mappedBy = "enrolledTrainees")
     @JsonManagedReference
+    @ToString.Exclude
+
     private List<Course> enrolledCourses;
 
     @ManyToMany(mappedBy = "likedTrainees")
     @JsonManagedReference
+    @ToString.Exclude
+
     private List<Course> likedCourses;
 
     public TraineeDto getDto() {

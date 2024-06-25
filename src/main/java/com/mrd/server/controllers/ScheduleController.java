@@ -88,7 +88,7 @@ public class ScheduleController {
     @GetMapping("/available-trainers")
     public List<TrainerDto> getAvailableTrainers(
             @RequestParam("startDateTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDateTime,
-            @RequestParam("duration") int duration) {
+            @RequestParam("duration") double duration) {
         return scheduleService.getAvailableTrainers(startDateTime, duration);
     }
 }

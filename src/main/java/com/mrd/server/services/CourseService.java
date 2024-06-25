@@ -12,5 +12,5 @@ public interface CourseService {
     List<CourseDto> getAllCourses();
     void deleteCourse(Long id);
     List<CourseDto> getCourseByName(String name);
-    CourseDto updateCourse(Long id, CourseDto courseDTO) throws IOException;
+    CourseDto updateCourse( CourseDto courseDTO) throws IOException;
 }

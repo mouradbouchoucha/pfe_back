@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "courses")
+
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -72,7 +74,9 @@ public class Course {
             courseDto.setCategory_id(category.getId());
             courseDto.setCategoryName(category.getName());
         }
-        courseDto.setSchedules(convertToScheduleDtoList(schedules));
+        if (schedules != null) {
+            courseDto.setSchedules(convertToScheduleDtoList(schedules));
+        }
         return courseDto;
     }
     private List<ScheduleDto> convertToScheduleDtoList(List<Schedule> schedules) {

@@ -1,53 +1,46 @@
 package com.mrd.server.services.impl;
 
-import com.mrd.server.dto.CategoryDto;
 import com.mrd.server.dto.CourseDto;
-import com.mrd.server.models.Category;
 import com.mrd.server.models.Course;
 import com.mrd.server.repositories.CourseRepository;
 import com.mrd.server.services.CourseService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
-    private final CourseRepository courseRepository;
-
+    @Autowired
+    private CourseRepository courseRepository;
 
     @Override
-    public CourseDto createCourse(CourseDto courseDTO) throws IOException {
+    public CourseDto createCourse(CourseDto courseDto) throws IOException {
         Course course = new Course();
-        course.setName(courseDTO.getName());
-        course.setDescription(courseDTO.getDescription());
-        course.setDuration(courseDTO.getDuration());
-        course.setStartDateTime(courseDTO.getStartDateTime());
-        course.setCategory(Category.builder().id(courseDTO.getCategory_id()).build());
-        byte[] imageData = courseDTO.getImageFile().getBytes();
-        course.setImage(imageData);
+        course.setName(courseDto.getName());
+        course.setDescription(courseDto.getDescription());
+        course.setDuration(courseDto.getDuration());
+        course.setStartDateTime(courseDto.getStartDateTime());
+        if (courseDto.getImageFile() != null && !courseDto.getImageFile().isEmpty()) {
+            course.setImage(courseDto.getImageFile().getBytes());
+        }
 
-        return courseRepository.save(course).getDto();
+        course = courseRepository.save(course);
+        return course.getDto();
     }
 
     @Override
     public CourseDto getCourseById(Long id) {
-        return Objects.requireNonNull(courseRepository.findById(id).orElse(null)).getDto();
+        Course course = courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
+        return course.getDto();
     }
 
     @Override
     public List<CourseDto> getAllCourses() {
-        return courseRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        return courseRepository.findAll().stream().map(Course::getDto).collect(Collectors.toList());
     }
 
     @Override
@@ -56,27 +49,22 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CourseDto updateCourse(Long id, CourseDto courseDTO) throws IOException {
-        Course existingCourse = courseRepository.findById(id).orElse(null);
-        if (existingCourse == null) {
-            return null; // or throw an exception
-        }
-        BeanUtils.copyProperties(courseDTO, existingCourse);
-        if (courseDTO.getImageFile() != null) {
-            byte[] imageData = courseDTO.getImageFile().getBytes();
-            courseDTO.setImage(imageData);
-        }
-        return convertToDTO(courseRepository.save(existingCourse));
+    public List<CourseDto> getCourseByName(String name) {
+        return courseRepository.findAllByNameContainingIgnoreCase(name).stream().map(Course::getDto).collect(Collectors.toList());
     }
 
-    private CourseDto convertToDTO(Course course) {
-        CourseDto courseDTO = new CourseDto();
-        BeanUtils.copyProperties(course, courseDTO);
-        return courseDTO;
-    }
     @Override
-    public List<CourseDto> getCourseByName(String name) {
-        List<Course> courses = courseRepository.findAllByNameOrDescriptionContainingIgnoreCase(name);
-        return courses.stream().map(Course::getDto).collect(Collectors.toList());
+    public CourseDto updateCourse(CourseDto courseDto) throws IOException {
+        Course course = courseRepository.findById(courseDto.getId()).orElseThrow(() -> new RuntimeException("Course not found"));
+        course.setName(courseDto.getName());
+        course.setDescription(courseDto.getDescription());
+        course.setDuration(courseDto.getDuration());
+        course.setStartDateTime(courseDto.getStartDateTime());
+        if (courseDto.getImageFile() != null && !courseDto.getImageFile().isEmpty()) {
+            course.setImage(courseDto.getImageFile().getBytes());
+        }
+
+        course = courseRepository.save(course);
+        return course.getDto();
     }
 }

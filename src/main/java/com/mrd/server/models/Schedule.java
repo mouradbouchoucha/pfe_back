@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -15,6 +16,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "schedules")
+@ToString(exclude = "course")
+
 public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +32,7 @@ public class Schedule {
     private Resource resource;
 
     private LocalDateTime startDateTime;
-    private int duration;
+    private double duration;  // Changed to double
     private LocalDateTime endDateTime;
     private String location;
 
@@ -43,7 +46,7 @@ public class Schedule {
 
     // Constructors, getters, and setters
 
-    public Schedule(LocalDateTime startDateTime, int duration) {
+    public Schedule(LocalDateTime startDateTime, double duration) {
         this.startDateTime = startDateTime;
         this.duration = duration;
         this.endDateTime = calculateEndDateTime();
@@ -54,14 +57,15 @@ public class Schedule {
         this.endDateTime = calculateEndDateTime();  // Update endDateTime whenever startDateTime is set
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(double duration) {
         this.duration = duration;
         this.endDateTime = calculateEndDateTime();  // Update endDateTime whenever duration is set
     }
 
     private LocalDateTime calculateEndDateTime() {
         if (startDateTime != null) {
-            return startDateTime.plusHours(duration);
+            long minutes = (long) (duration * 60);  // Convert hours to minutes
+            return startDateTime.plusMinutes(minutes);
         } else {
             return null;
         }

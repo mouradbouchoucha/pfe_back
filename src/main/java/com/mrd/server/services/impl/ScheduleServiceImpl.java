@@ -124,8 +124,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<TrainerDto> getAvailableTrainers(LocalDateTime startDateTime, int duration) {
-        LocalDateTime endDateTime = startDateTime.plusHours(duration);
+    public List<TrainerDto> getAvailableTrainers(LocalDateTime startDateTime, double duration) {
+        // Convert duration from double to long (assuming duration is in hours)
+        long durationInHours = (long) duration;
+
+        LocalDateTime endDateTime = startDateTime.plusHours(durationInHours);
 
         List<Trainer> allTrainers = trainerRepository.findAll();
         List<Schedule> conflictingSchedules = scheduleRepository.findConflictingSchedules(startDateTime, endDateTime);
@@ -139,5 +142,6 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .map(Trainer::getDto)
                 .collect(Collectors.toList());
     }
+
 
 }
