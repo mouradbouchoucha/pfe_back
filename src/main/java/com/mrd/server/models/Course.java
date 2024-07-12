@@ -8,8 +8,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "courses")
-
 public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,10 +39,9 @@ public class Course {
     private List<Schedule> schedules;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = true)
     @JsonBackReference
     private Category category;
-
 
     @ManyToMany
     @JoinTable(
@@ -62,6 +61,29 @@ public class Course {
     @JsonBackReference
     private List<Trainee> likedTrainees;
 
+    @Column(nullable = false, name = "created_at", updatable = false)
+    private Timestamp createdAt;
+
+    @Column(nullable = false, name = "updated_at")
+    private Timestamp updatedAt;
+
+    @PreRemove
+    private void preRemove() {
+        for (Schedule s : schedules) {
+            s.setCourse(null);
+        }
+    }
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Timestamp.from(Instant.now());
+        this.updatedAt = this.createdAt;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Timestamp.from(Instant.now());
+    }
+
     public CourseDto getDto() {
         CourseDto courseDto = new CourseDto();
         courseDto.setId(id);
@@ -79,6 +101,7 @@ public class Course {
         }
         return courseDto;
     }
+
     private List<ScheduleDto> convertToScheduleDtoList(List<Schedule> schedules) {
         return schedules.stream().map(this::convertToScheduleDto).collect(Collectors.toList());
     }
@@ -86,7 +109,6 @@ public class Course {
     private ScheduleDto convertToScheduleDto(Schedule schedule) {
         ScheduleDto scheduleDto = new ScheduleDto();
         scheduleDto.setId(schedule.getId());
-
         scheduleDto.setDuration(schedule.getDuration());
         scheduleDto.setLocation(schedule.getLocation());
         scheduleDto.setCourse(convertToCourseDto(schedule.getCourse()));

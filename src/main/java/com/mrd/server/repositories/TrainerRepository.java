@@ -10,4 +10,6 @@ public interface TrainerRepository extends JpaRepository<Trainer,Long> {
     List<Trainer> findAllByFirstNameContainingIgnoreCase(String name);
 
     Optional<Trainer> findByEmail(String email);
+
+    List<Trainer> findAllByOrderByCreatedAtDesc();
 }

@@ -23,8 +23,10 @@ public class CategoryServiceImpl implements CategoryService {
         category.setName(categoryDto.getName());
         category.setDescription(categoryDto.getDescription());
 
-        byte[] imageData = categoryDto.getImageFile().getBytes();
-        category.setImage(imageData);
+        if (categoryDto.getImageFile() != null) {
+            byte[] imageData = categoryDto.getImageFile().getBytes();
+            category.setImage(imageData);
+        }
 
         return categoryRepository.save(category).getDto();
     }
@@ -64,6 +66,12 @@ public class CategoryServiceImpl implements CategoryService {
             return getAllCategories();
         }
         List<Category> categories = categoryRepository.findAllByNameContainingIgnoreCase(name);
+        return categories.stream().map(Category::getDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CategoryDto> getAllCategoriesOrderByCreatedAt() {
+        List<Category> categories = categoryRepository.findAllByOrderByCreatedAtDesc();
         return categories.stream().map(Category::getDto).collect(Collectors.toList());
     }
 }

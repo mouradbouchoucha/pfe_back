@@ -17,4 +17,6 @@ public interface TraineeService {
     TraineeDto enrollInCourse(Long traineeId, Long courseId);
 
     TraineeDto likeCourse(Long traineeId, Long courseId);
+
+    List<TraineeDto> getTraineesSortedByCreatedAt();
 }

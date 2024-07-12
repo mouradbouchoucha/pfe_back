@@ -31,13 +31,20 @@ public class TraineeServiceImpl implements TraineeService {
         trainee.setAddress(traineeDto.getAddress());
         trainee.setCity(traineeDto.getCity());
 
-        byte[] imageData = traineeDto.getProfilePictureFile().getBytes();
-        trainee.setProfilePicture(imageData);
+        if (traineeDto.getProfilePictureFile() != null) {
+            byte[] imageData = traineeDto.getProfilePictureFile().getBytes();
+            trainee.setProfilePicture(imageData);
+        }
         return traineeRepository.save(trainee).getDto();
     }
 
     public List<TraineeDto> getAllTrainees() {
         List<Trainee> trainees = traineeRepository.findAll();
+        return trainees.stream().map(Trainee::getDto).collect(Collectors.toList());
+    }
+
+    public List<TraineeDto> getTraineesSortedByCreatedAt() {
+        List<Trainee> trainees = traineeRepository.findAllByOrderByCreatedAtDesc();
         return trainees.stream().map(Trainee::getDto).collect(Collectors.toList());
     }
 
@@ -48,7 +55,7 @@ public class TraineeServiceImpl implements TraineeService {
     public TraineeDto updateTrainee(TraineeDto traineeDto) throws IOException {
         Trainee trainee = traineeRepository.findById(traineeDto.getId())
                 .orElseThrow();
-        System.out.println(trainee);
+        System.out.println("traineeDto: " + traineeDto);
         trainee.setFirstName(traineeDto.getFirstName());
         trainee.setLastName(traineeDto.getLastName());
         trainee.setEmail(traineeDto.getEmail());

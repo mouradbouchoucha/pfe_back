@@ -2,8 +2,10 @@ package com.mrd.server.services.impl;
 
 import com.mrd.server.dto.CourseDto;
 import com.mrd.server.models.Course;
+import com.mrd.server.repositories.CategoryRepository;
 import com.mrd.server.repositories.CourseRepository;
 import com.mrd.server.services.CourseService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +14,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
 
-    @Autowired
-    private CourseRepository courseRepository;
+    private final CourseRepository courseRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public CourseDto createCourse(CourseDto courseDto) throws IOException {
@@ -24,6 +27,7 @@ public class CourseServiceImpl implements CourseService {
         course.setDescription(courseDto.getDescription());
         course.setDuration(courseDto.getDuration());
         course.setStartDateTime(courseDto.getStartDateTime());
+        course.setCategory(categoryRepository.findById(courseDto.getCategory_id()).orElseThrow());
         if (courseDto.getImageFile() != null && !courseDto.getImageFile().isEmpty()) {
             course.setImage(courseDto.getImageFile().getBytes());
         }
@@ -31,6 +35,7 @@ public class CourseServiceImpl implements CourseService {
         course = courseRepository.save(course);
         return course.getDto();
     }
+
 
     @Override
     public CourseDto getCourseById(Long id) {
@@ -60,11 +65,18 @@ public class CourseServiceImpl implements CourseService {
         course.setDescription(courseDto.getDescription());
         course.setDuration(courseDto.getDuration());
         course.setStartDateTime(courseDto.getStartDateTime());
+        course.setCategory(categoryRepository.findById(courseDto.getCategory_id()).orElseThrow());
         if (courseDto.getImageFile() != null && !courseDto.getImageFile().isEmpty()) {
             course.setImage(courseDto.getImageFile().getBytes());
         }
 
         course = courseRepository.save(course);
         return course.getDto();
+    }
+
+    @Override
+    public List<CourseDto> getAllCoursesOrderByCreatedAt() {
+        List<Course> courses = courseRepository.findAllByOrderByCreatedAtDesc();
+        return courses.stream().map(Course::getDto).collect(Collectors.toList());
     }
 }

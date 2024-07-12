@@ -1,6 +1,7 @@
 package com.mrd.server.dto;
 
 import com.mrd.server.models.Gender;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,7 +16,6 @@ public class TrainerDto {
     private String departmentName;
     private Integer yearsOfExperience;
     private String degree;
-    private Gender gender;
     private String phoneNumber;
     private String address;
     private String city;

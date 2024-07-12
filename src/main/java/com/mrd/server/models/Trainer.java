@@ -22,7 +22,6 @@ public class Trainer extends User {
     private String departmentName;
     private Integer yearsOfExperience;
     private String degree;
-    private Gender gender;
     private String phoneNumber;
     private String address;
     private String city;

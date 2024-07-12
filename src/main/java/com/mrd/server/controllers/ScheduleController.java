@@ -24,8 +24,8 @@ public class ScheduleController {
     private final ScheduleRepository scheduleRepository;
 
     @PostMapping("/create")
-    public ResponseEntity<ScheduleDto> createSchedule(@RequestBody ScheduleDto scheduleDto) {
-        ScheduleDto createdSchedule = scheduleService.createSchedule(scheduleDto);
+    public ResponseEntity<ScheduleDto> createSchedule(@RequestBody ScheduleDto scheduleDto, @RequestParam Long course_id) {
+        ScheduleDto createdSchedule = scheduleService.createSchedule(scheduleDto, course_id);
         return ResponseEntity.ok(createdSchedule);
     }
 

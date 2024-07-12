@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,18 +25,23 @@ public class Notification {
     private User user;
     private String title;
     private String message;
-    private LocalDateTime timestamp;
+    private Timestamp createdAt;
     private String type;
-    private boolean isRead;
+    private boolean is_read;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Timestamp.from(Instant.now());
+    }
 
     public NotificationDto getDto(){
         NotificationDto notificationDto = new NotificationDto();
         notificationDto.setId(id);
         notificationDto.setTitle(title);
         notificationDto.setMessage(message);
-        notificationDto.setTimestamp(timestamp);
+        notificationDto.setCreatedAt(createdAt);
         notificationDto.setType(type);
-        notificationDto.setRead(isRead);
+        notificationDto.setRead(is_read);
         return notificationDto;
     }
 }

@@ -47,4 +47,11 @@ public class AuthController {
         return ResponseEntity.ok("Email verified successfully");
     }
 
+    @GetMapping("/verify_email")
+    public ResponseEntity<Boolean> verifyEmail(@RequestParam("email") String email) {
+//        System.out.println(email);
+        return ResponseEntity.ok(userRepository.existsByEmail(email));
+    }
+
+
 }

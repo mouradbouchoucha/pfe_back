@@ -1,7 +1,11 @@
 package com.mrd.server.dto;
 
+import com.mrd.server.models.Category;
+import com.mrd.server.repositories.CategoryRepository;
 import jakarta.persistence.Column;
+import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,5 +28,8 @@ public class CourseDto {
 
     private Long category_id;
     private String categoryName;
+
+
+
 
 }

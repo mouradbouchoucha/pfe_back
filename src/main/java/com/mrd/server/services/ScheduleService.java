@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface ScheduleService {
-    ScheduleDto createSchedule(ScheduleDto scheduleDTO);
+    ScheduleDto createSchedule(ScheduleDto scheduleDTO,Long course_id);
     ScheduleDto getScheduleById(Long id);
     List<ScheduleDto> getAllSchedules();
     void deleteSchedule(Long id);

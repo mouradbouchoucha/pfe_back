@@ -14,4 +14,6 @@ public interface CategoryService {
     CategoryDto updateCategory(CategoryDto categoryDto) throws IOException;
 
     List<CategoryDto> getCategoriesByName(String name);
+
+    List<CategoryDto> getAllCategoriesOrderByCreatedAt();
 }

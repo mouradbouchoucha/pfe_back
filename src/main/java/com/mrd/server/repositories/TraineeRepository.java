@@ -10,4 +10,7 @@ public interface TraineeRepository extends JpaRepository<Trainee, Long> {
     Trainee findByEmail(String email);
 
     List<Trainee> findAllByFirstNameContainingIgnoreCase(String name);
+
+    List<Trainee> findAllByOrderByCreatedAtDesc();
+
 }

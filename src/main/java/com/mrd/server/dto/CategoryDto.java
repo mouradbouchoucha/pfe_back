@@ -1,5 +1,6 @@
 package com.mrd.server.dto;
 
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,5 +12,5 @@ public class CategoryDto {
     private String description;
     private byte[] image;
 
-    private MultipartFile imageFile;
+    public MultipartFile imageFile;
 }

@@ -13,4 +13,6 @@ public interface TrainerService {
     List<TrainerDto> getTrainersByName(String name);
 
     TrainerDto getTrainerById(Long id);
+
+    List<TrainerDto> getAllTrainersByOrderCreatedAt();
 }

@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 @Entity
@@ -31,6 +33,30 @@ public class Category {
     @OneToMany(mappedBy = "category")
     @JsonManagedReference
     private List<Course> courses;
+
+    @Column(nullable = false, name = "created_at", updatable = false)
+    private Timestamp createdAt;
+
+    @Column(nullable = true, name = "updated_at")
+    private Timestamp updatedAt;
+
+    @PreRemove
+    private void preRemove() {
+        for (Course s : courses) {
+            s.setCategory(null);
+        }
+    }
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Timestamp.from(Instant.now());
+        this.updatedAt = this.createdAt;
+
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Timestamp.from(Instant.now());
+    }
 
     public CategoryDto getDto() {
         CategoryDto categoryDto = new CategoryDto();

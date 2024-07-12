@@ -6,6 +6,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
@@ -27,13 +29,40 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
+
+    @Column(nullable = false, name = "created_at", updatable = false)
+    private Timestamp createdAt;
+
+    @Column(nullable = false, name = "updated_at")
+    private Timestamp updatedAt;
+
     @Column(nullable = false)
-    private String password = "pwd";
+    private int cin;
+
+    @Column(nullable = false)
+    private String password;
 
     private boolean enabled;
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(mappedBy = "user")
+    private List<Notification> notifications;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = Timestamp.from(Instant.now());
+        this.updatedAt = this.createdAt;
+        if (this.password == null || this.password.isEmpty()) {
+            this.password = String.valueOf(this.cin);
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = Timestamp.from(Instant.now());
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -45,7 +74,7 @@ public class User implements UserDetails {
         return email;
     }
 
-    public String getName(){
+    public String getName() {
         return firstName;
     }
 

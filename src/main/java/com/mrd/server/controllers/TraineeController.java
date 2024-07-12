@@ -25,8 +25,8 @@ public class TraineeController {
     private final TraineeRepository traineeRepository;
 
     @GetMapping("/all")
-    public ResponseEntity<List<TraineeDto>> getAllTrainees() {
-        List<TraineeDto> trainees = traineeService.getAllTrainees();
+    public ResponseEntity<List<TraineeDto>> getAllTraineesByOrderCreatedAt() {
+        List<TraineeDto> trainees = traineeService.getTraineesSortedByCreatedAt();
         return ResponseEntity.ok().body(trainees);
     }
 
@@ -61,6 +61,7 @@ public class TraineeController {
         traineeDto.setLastName(lastName);
         traineeDto.setEmail(_trainee.get().getEmail());
         traineeDto.setPhoneNumber(phoneNumber);
+        traineeDto.setProfession(profession);
         traineeDto.setAddress(address);
         traineeDto.setCity(city);
         traineeDto.setProfilePictureFile(profilePictureFile);

@@ -13,4 +13,6 @@ public interface CourseService {
     void deleteCourse(Long id);
     List<CourseDto> getCourseByName(String name);
     CourseDto updateCourse( CourseDto courseDTO) throws IOException;
+
+    List<CourseDto> getAllCoursesOrderByCreatedAt();
 }

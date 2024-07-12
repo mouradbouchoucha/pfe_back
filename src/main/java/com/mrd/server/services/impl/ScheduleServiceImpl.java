@@ -2,12 +2,8 @@ package com.mrd.server.services.impl;
 
 import com.mrd.server.dto.ScheduleDto;
 import com.mrd.server.dto.TrainerDto;
-import com.mrd.server.models.Course;
-import com.mrd.server.models.Schedule;
-import com.mrd.server.models.Trainer;
-import com.mrd.server.repositories.CourseRepository;
-import com.mrd.server.repositories.ScheduleRepository;
-import com.mrd.server.repositories.TrainerRepository;
+import com.mrd.server.models.*;
+import com.mrd.server.repositories.*;
 import com.mrd.server.services.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -16,8 +12,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,18 +26,42 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final TrainerRepository trainerRepository;
     private final CourseRepository courseRepository;
+    private final SubjectRepository subjectRepository;
+    private final ResourceRepository resourceRepository;
 
     @Override
-    public ScheduleDto createSchedule(ScheduleDto scheduleDTO) {
+    public ScheduleDto createSchedule(ScheduleDto scheduleDTO, Long course_id) {
+        Course course = courseRepository.findById(course_id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid course ID"));
+
+        Trainer trainer = trainerRepository.findById(scheduleDTO.getTrainer().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid trainer ID"));
+
+        Set<Subject> subjects = new HashSet<>();
+        if (scheduleDTO.getSubjects() != null) {
+            subjects = scheduleDTO.getSubjects().stream()
+                    .map(subjectDto -> subjectRepository.findById(subjectDto.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("Invalid subject ID")))
+                    .collect(Collectors.toSet());
+        }
+
+        LocalDateTime startDateTime = scheduleDTO.getStartDateTime();
+        LocalDateTime endDateTime = startDateTime.plusMinutes((long) (scheduleDTO.getDuration() * 60));
+        System.out.println(startDateTime);
         Schedule schedule = new Schedule();
         BeanUtils.copyProperties(scheduleDTO, schedule);
-        Course course = courseRepository.findById(scheduleDTO.getCourse().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid course ID"));
-        schedule.setCourse(course);        schedule.setStartDateTime(scheduleDTO.getStartDateTime());
-        schedule.setDuration(scheduleDTO.getDuration());
+        schedule.setCourse(course);
+        schedule.setTrainer(trainer);
+        schedule.setSubjects(subjects);
+//        schedule.setResource(resourceRepository.findById(1L).orElse(null));
+        schedule.setStartDateTime(startDateTime);
+//        schedule.setEndDateTime(endDateTime);
+
         Schedule savedSchedule = scheduleRepository.save(schedule);
-        return convertToDTO(savedSchedule);
+        return savedSchedule.getDto();
     }
+
+
 
     @Override
     public ScheduleDto getScheduleById(Long id) {
@@ -110,11 +132,12 @@ public class ScheduleServiceImpl implements ScheduleService {
         if (schedule.getCourse() != null) {
             scheduleDto.setCourse(schedule.getCourse().getDto());
         }
-        if (schedule.getResource() != null) {
-            scheduleDto.setResource(schedule.getResource().getDto());
-        }
-        if (schedule.getSubject() != null) {
-            scheduleDto.setSubject(schedule.getSubject().getDto());
+//        if (schedule.getResource() != null) {
+//            scheduleDto.setResource(schedule.getResource().getDto());
+//        }
+        if (schedule.getSubjects() != null) {
+            //to verify
+            scheduleDto.setSubjects(schedule.getSubjects().stream().collect(Collectors.toSet()).stream().map(Subject::getDto).collect(Collectors.toSet()));
         }
         if (schedule.getTrainer() != null) {
             scheduleDto.setTrainer(schedule.getTrainer().getDto());

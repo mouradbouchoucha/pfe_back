@@ -1,8 +1,12 @@
 package com.mrd.server.controllers;
 
 import com.mrd.server.dto.CourseDto;
+import com.mrd.server.models.Category;
+import com.mrd.server.repositories.CategoryRepository;
 import com.mrd.server.services.CourseService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,13 +16,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/courses")
+@RequiredArgsConstructor
 public class CourseController {
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
+    private final CategoryRepository categoryRepository;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
@@ -27,12 +33,14 @@ public class CourseController {
                                                   @RequestParam("description") String description,
                                                   @RequestParam("duration") int duration,
                                                   @RequestParam("startDateTime") String startDateTime,
+                                                  @RequestParam("category_id") Long category_id,
                                                   @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
         CourseDto courseDto = new CourseDto();
         courseDto.setName(name);
         courseDto.setDescription(description);
         courseDto.setDuration(duration);
-
+        courseDto.setCategory_id(category_id);
+        courseDto.setCategoryName(categoryRepository.findById(category_id).get().getName());
         try {
             courseDto.setStartDateTime(LocalDateTime.parse(startDateTime, DATE_TIME_FORMATTER));
         } catch (DateTimeParseException e) {
@@ -57,6 +65,12 @@ public class CourseController {
         return ResponseEntity.ok(courses);
     }
 
+    @GetMapping("/all_SortedByCreatedAt")
+    public ResponseEntity<List<CourseDto>> getAllCoursesSortedByCreatedAt() {
+        List<CourseDto> courses = courseService.getAllCoursesOrderByCreatedAt();
+        return ResponseEntity.ok(courses);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
         courseService.deleteCourse(id);
@@ -70,17 +84,28 @@ public class CourseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CourseDto> updateCourse(@PathVariable Long id,
-                                                  @RequestParam("name") String name,
-                                                  @RequestParam("description") String description,
-                                                  @RequestParam("duration") int duration,
-                                                  @RequestParam("startDateTime") String startDateTime,
-                                                  @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+    public ResponseEntity<CourseDto> updateCourse(
+            @PathVariable Long id,
+            @RequestParam("name") String name,
+            @RequestParam("description") String description,
+            @RequestParam("duration") int duration,
+            @RequestParam("startDateTime") String startDateTime,
+            @RequestParam("category_id") Long category_id,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+
         CourseDto courseDto = new CourseDto();
         courseDto.setId(id);
         courseDto.setName(name);
         courseDto.setDescription(description);
         courseDto.setDuration(duration);
+        courseDto.setCategory_id(category_id);
+
+        // Fetch category and handle the case where it is not found
+        Optional<Category> categoryOptional = categoryRepository.findById(category_id);
+        if (categoryOptional.isEmpty()) {
+            return ResponseEntity.badRequest().body(null);
+        }
+        courseDto.setCategoryName(categoryOptional.get().getName());
 
         try {
             courseDto.setStartDateTime(LocalDateTime.parse(startDateTime, DATE_TIME_FORMATTER));
@@ -93,5 +118,6 @@ public class CourseController {
         CourseDto updatedCourse = courseService.updateCourse(courseDto);
         return ResponseEntity.ok(updatedCourse);
     }
+
 }
 

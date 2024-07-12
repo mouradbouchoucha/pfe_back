@@ -22,15 +22,29 @@ public class CategoryController {
 
     @PostMapping("/create")
     public ResponseEntity<CategoryDto> createCategory(
-            @ModelAttribute CategoryDto categoryDto
-    ) throws IOException {
-        CategoryDto _categoryDto = categoryService.createCategory(categoryDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(_categoryDto);
+            @RequestPart("name") String name,
+            @RequestPart("description") String description,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile    ) throws IOException {
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setName(name);
+        categoryDto.setDescription(description);
+        if (imageFile != null) {
+            byte[] imageData = imageFile.getBytes();
+            categoryDto.setImage(imageData);
+        }
+        categoryService.createCategory(categoryDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(categoryDto);
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<CategoryDto>> getAllCategories() {
         List<CategoryDto> categories = categoryService.getAllCategories();
+        return ResponseEntity.ok().body(categories);
+    }
+
+    @GetMapping("/all_SortedByCreatedAt")
+    public ResponseEntity<List<CategoryDto>> getAllCategoriesSortedByCreatedAt() {
+        List<CategoryDto> categories = categoryService.getAllCategoriesOrderByCreatedAt();
         return ResponseEntity.ok().body(categories);
     }
 
