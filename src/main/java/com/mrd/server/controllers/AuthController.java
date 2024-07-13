@@ -1,5 +1,6 @@
 package com.mrd.server.controllers;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.mrd.server.dto.JwtAuthenticationResponse;
 import com.mrd.server.dto.SignInRequest;
 import com.mrd.server.dto.SignUpRequest;
@@ -23,6 +24,9 @@ public class AuthController {
     private final AuthenticationService authenticationService;
     private final VerificationTokenRepository tokenRepository;
     private final UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+
     @PostMapping("/signup")
     public ResponseEntity<User> signUp(@RequestBody SignUpRequest signUpRequest){
         return ResponseEntity.ok(authenticationService.signUp(signUpRequest));
@@ -36,16 +40,35 @@ public class AuthController {
     @GetMapping("/verify")
     public ResponseEntity<String> verifyAccount(@RequestParam("token") String token) {
         VerificationToken verificationToken = tokenRepository.findByToken(token);
-        if (verificationToken == null || verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token or Expired");
+        if (verificationToken == null) {
+            logger.error("Invalid token: {}", token);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token");
+        }
+        if (verificationToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            logger.error("Expired token: {}", token);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token expired");
         }
 
         User user = verificationToken.getUser();
+        logger.info("Found user for token: {}", user);
+
         user.setEnabled(true);
         userRepository.save(user);
+        logger.info("User enabled and saved: {}", user);
 
-        return ResponseEntity.ok("Email verified successfully");
+        tokenRepository.delete(verificationToken); // Invalidate the token after successful verification
+        logger.info("Verification token deleted: {}", verificationToken);
+
+        User updatedUser = userRepository.findById(user.getId()).orElse(null);
+        if (updatedUser != null && updatedUser.isEnabled()) {
+            logger.info("User enabled successfully: {}", updatedUser);
+            return ResponseEntity.ok("Email verified successfully");
+        } else {
+            logger.error("Failed to update user: {}", user);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update user");
+        }
     }
+
 
     @GetMapping("/verify_email")
     public ResponseEntity<Boolean> verifyEmail(@RequestParam("email") String email) {

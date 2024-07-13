@@ -52,15 +52,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         User savedUser = userRepository.save(user);
 
         // Generate a verification token
-//        String token = UUID.randomUUID().toString();
-//        VerificationToken verificationToken = new VerificationToken();
-//        verificationToken.setToken(token);
-//        verificationToken.setUser(savedUser);
-//        verificationToken.setExpiryDate(LocalDateTime.now().plusHours(24)); // Token valid for 24 hours
-//        verificationTokenRepository.save(verificationToken);
-//
-//        // Send verification email
-//        emailService.sendVerificationEmail(savedUser, token);
+        String token = UUID.randomUUID().toString();
+        VerificationToken verificationToken = new VerificationToken();
+        verificationToken.setToken(token);
+        verificationToken.setUser(savedUser);
+        verificationToken.setExpiryDate(LocalDateTime.now().plusHours(24)); // Token valid for 24 hours
+        verificationTokenRepository.save(verificationToken);
+
+        // Send verification email
+        emailService.sendVerificationEmail(savedUser, token);
 
         return savedUser;
     }
