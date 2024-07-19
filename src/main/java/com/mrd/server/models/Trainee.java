@@ -24,6 +24,11 @@ public class Trainee extends User {
     @Column(columnDefinition = "LONGBLOB", length = 1000000000)
     private byte[] profilePicture;
 
+    @OneToMany(mappedBy = "trainee")
+    @JsonManagedReference
+    private List<EnrollmentRequest> enrollmentRequests;
+
+
     @ManyToMany(mappedBy = "enrolledTrainees")
     @JsonManagedReference
     @ToString.Exclude

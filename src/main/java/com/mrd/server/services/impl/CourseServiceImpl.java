@@ -79,4 +79,6 @@ public class CourseServiceImpl implements CourseService {
         List<Course> courses = courseRepository.findAllByOrderByCreatedAtDesc();
         return courses.stream().map(Course::getDto).collect(Collectors.toList());
     }
+
+
 }

@@ -2,7 +2,12 @@ package com.mrd.server.controllers;
 
 import com.mrd.server.dto.CourseDto;
 import com.mrd.server.models.Category;
+import com.mrd.server.models.Course;
+import com.mrd.server.models.EnrollmentRequest;
+import com.mrd.server.models.Trainee;
 import com.mrd.server.repositories.CategoryRepository;
+import com.mrd.server.repositories.EnrollmentRequestRepository;
+import com.mrd.server.repositories.TraineeRepository;
 import com.mrd.server.services.CourseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +30,8 @@ public class CourseController {
 
     private final CourseService courseService;
     private final CategoryRepository categoryRepository;
+    private final EnrollmentRequestRepository enrollmentRequestRepository;
+    private final TraineeRepository traineeRepository;
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
@@ -117,6 +124,34 @@ public class CourseController {
 
         CourseDto updatedCourse = courseService.updateCourse(courseDto);
         return ResponseEntity.ok(updatedCourse);
+    }
+
+    @PostMapping("/approve-enrollment")
+    public ResponseEntity<String> approveEnrollment(@RequestParam Long requestId) {
+        EnrollmentRequest request = enrollmentRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        request.setStatus(EnrollmentRequest.Status.APPROVED);
+        enrollmentRequestRepository.save(request);
+
+        Trainee trainee = request.getTrainee();
+        Course course = request.getCourse();
+
+        trainee.getEnrolledCourses().add(course);
+        traineeRepository.save(trainee);
+
+        return ResponseEntity.ok("Enrollment approved");
+    }
+
+    @PostMapping("/reject-enrollment")
+    public ResponseEntity<String> rejectEnrollment(@RequestParam Long requestId) {
+        EnrollmentRequest request = enrollmentRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        request.setStatus(EnrollmentRequest.Status.REJECTED);
+        enrollmentRequestRepository.save(request);
+
+        return ResponseEntity.ok("Enrollment rejected");
     }
 
 }

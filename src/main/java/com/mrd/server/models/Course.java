@@ -52,6 +52,10 @@ public class Course {
     @JsonBackReference
     private List<Trainee> enrolledTrainees;
 
+    @OneToMany(mappedBy = "course")
+    @JsonManagedReference
+    private List<EnrollmentRequest> enrollmentRequests;
+
     @ManyToMany
     @JoinTable(
             name = "course_trainee_likes",

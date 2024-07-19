@@ -2,8 +2,10 @@ package com.mrd.server.services.impl;
 
 import com.mrd.server.dto.TraineeDto;
 import com.mrd.server.models.Course;
+import com.mrd.server.models.EnrollmentRequest;
 import com.mrd.server.models.Trainee;
 import com.mrd.server.repositories.CourseRepository;
+import com.mrd.server.repositories.EnrollmentRequestRepository;
 import com.mrd.server.repositories.TraineeRepository;
 import com.mrd.server.services.TraineeService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     private final TraineeRepository traineeRepository;
     private final CourseRepository courseRepository;
+    private final EnrollmentRequestRepository enrollmentRequestRepository;
 
     public TraineeDto createTrainee(TraineeDto traineeDto)throws IOException {
         Trainee trainee = new Trainee();
@@ -83,14 +86,21 @@ public class TraineeServiceImpl implements TraineeService {
     public TraineeDto enrollInCourse(Long traineeId, Long courseId) {
         Optional<Trainee> traineeOptional = traineeRepository.findById(traineeId);
         Optional<Course> courseOptional = courseRepository.findById(courseId);
+
         if (traineeOptional.isPresent() && courseOptional.isPresent()) {
             Trainee trainee = traineeOptional.get();
             Course course = courseOptional.get();
-            trainee.getEnrolledCourses().add(course);
-            trainee = traineeRepository.save(trainee);
+
+            EnrollmentRequest enrollmentRequest = new EnrollmentRequest();
+            enrollmentRequest.setTrainee(trainee);
+            enrollmentRequest.setCourse(course);
+            enrollmentRequest.setStatus(EnrollmentRequest.Status.PENDING);
+
+            enrollmentRequest = enrollmentRequestRepository.save(enrollmentRequest);
 
             return trainee.getDto();
         }
+
         return null;
     }
 
