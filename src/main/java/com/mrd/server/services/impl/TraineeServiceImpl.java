@@ -3,12 +3,15 @@ package com.mrd.server.services.impl;
 import com.mrd.server.dto.TraineeDto;
 import com.mrd.server.models.Course;
 import com.mrd.server.models.EnrollmentRequest;
+import com.mrd.server.models.Role;
 import com.mrd.server.models.Trainee;
 import com.mrd.server.repositories.CourseRepository;
 import com.mrd.server.repositories.EnrollmentRequestRepository;
 import com.mrd.server.repositories.TraineeRepository;
+import com.mrd.server.repositories.UserRepository;
 import com.mrd.server.services.TraineeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,6 +25,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     private final TraineeRepository traineeRepository;
     private final CourseRepository courseRepository;
+    private final UserRepository userRepository;
     private final EnrollmentRequestRepository enrollmentRequestRepository;
 
     public TraineeDto createTrainee(TraineeDto traineeDto)throws IOException {
@@ -98,6 +102,15 @@ public class TraineeServiceImpl implements TraineeService {
 
             enrollmentRequest = enrollmentRequestRepository.save(enrollmentRequest);
 
+            String url = "http://localhost:4200/verify?token=" ;
+            String subject = "Verify your email";
+            String message = "Please click the following link to verify your email: " + url;
+
+            SimpleMailMessage email = new SimpleMailMessage();
+            email.setTo(userRepository.findByRole(Role.ADMIN).getEmail());
+            email.setSubject(subject);
+            email.setText(message);
+
             return trainee.getDto();
         }
 
@@ -114,6 +127,24 @@ public class TraineeServiceImpl implements TraineeService {
             trainee.getLikedCourses().add(course);
             trainee = traineeRepository.save(trainee);
             return trainee.getDto();
+        }
+        return null;
+    }
+
+    @Override
+    public TraineeDto getTraineeByEmail(String email) {
+        Optional<Trainee> trainee = traineeRepository.findByEmail(email);
+        if (trainee.isPresent()) {
+            return trainee.get().getDto();
+        }
+        return null;
+    }
+
+    @Override
+    public TraineeDto getTraineeById(Long id) {
+        Optional<Trainee> trainee = traineeRepository.findById(id);
+        if (trainee.isPresent()) {
+            return trainee.get().getDto();
         }
         return null;
     }

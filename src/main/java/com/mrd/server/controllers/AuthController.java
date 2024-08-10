@@ -50,6 +50,11 @@ public class AuthController {
         }
 
         User user = verificationToken.getUser();
+        if (user == null) {
+            logger.error("User not found for token: {}", token);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+        }
+
         logger.info("Found user for token: {}", user);
 
         user.setEnabled(true);
@@ -59,15 +64,9 @@ public class AuthController {
         tokenRepository.delete(verificationToken); // Invalidate the token after successful verification
         logger.info("Verification token deleted: {}", verificationToken);
 
-        User updatedUser = userRepository.findById(user.getId()).orElse(null);
-        if (updatedUser != null && updatedUser.isEnabled()) {
-            logger.info("User enabled successfully: {}", updatedUser);
-            return ResponseEntity.ok("Email verified successfully");
-        } else {
-            logger.error("Failed to update user: {}", user);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update user");
-        }
+        return ResponseEntity.ok("Email verified successfully");
     }
+
 
 
     @GetMapping("/verify_email")

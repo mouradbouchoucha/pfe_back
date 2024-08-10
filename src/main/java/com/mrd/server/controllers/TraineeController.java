@@ -2,8 +2,10 @@ package com.mrd.server.controllers;
 
 import com.mrd.server.dto.TraineeDto;
 import com.mrd.server.models.Trainee;
+import com.mrd.server.models.User;
 import com.mrd.server.repositories.TraineeRepository;
 import com.mrd.server.services.TraineeService;
+import com.mrd.server.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,7 @@ import java.util.Optional;
 public class TraineeController {
 
     private final TraineeService traineeService;
-
+    private final UserService userService;
     private final TraineeRepository traineeRepository;
 
     @GetMapping("/all")
@@ -92,5 +94,13 @@ public class TraineeController {
             return ResponseEntity.ok(updatedTrainee);
         }
         return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping("trainee")
+    public ResponseEntity<User> getTraineeByEmail(@RequestParam String email) {
+        User traineeDto = userService.findUserByEmail(email);
+        Long id = traineeDto.getId();
+        TraineeDto trainee = traineeService.getTraineeById(id);
+        return ResponseEntity.ok().body(traineeDto);
     }
 }
