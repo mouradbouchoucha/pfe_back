@@ -75,5 +75,9 @@ public class AuthController {
         return ResponseEntity.ok(userRepository.existsByEmail(email));
     }
 
+//    @GetMapping("/user/{email}")
+//    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+//        return ResponseEntity.ok(userRepository.findByEmail(email).orElse(null));
+//    }
 
 }

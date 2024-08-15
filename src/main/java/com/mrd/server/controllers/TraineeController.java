@@ -103,4 +103,11 @@ public class TraineeController {
         TraineeDto trainee = traineeService.getTraineeById(id);
         return ResponseEntity.ok().body(traineeDto);
     }
+
+    @GetMapping("trainee/{id}")
+    public ResponseEntity<TraineeDto> getTraineeById(@PathVariable Long id) {
+        TraineeDto trainee = traineeService.getTraineeById(id);
+        System.out.println(trainee);
+        return ResponseEntity.ok().body(trainee);
+    }
 }
