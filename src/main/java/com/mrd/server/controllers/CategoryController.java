@@ -75,4 +75,9 @@ public class CategoryController {
         List<CategoryDto> categoriesDtos = categoryService.getCategoriesByName(name);
         return ResponseEntity.ok().body(categoriesDtos);
     }
+
+    @GetMapping("/courses")
+    public List<CategoryDto> getCategoriesWithCourses() {
+        return categoryService.getCategoriesWithCourses();
+    }
 }

@@ -16,4 +16,6 @@ public interface CategoryService {
     List<CategoryDto> getCategoriesByName(String name);
 
     List<CategoryDto> getAllCategoriesOrderByCreatedAt();
+
+    List<CategoryDto> getCategoriesWithCourses();
 }

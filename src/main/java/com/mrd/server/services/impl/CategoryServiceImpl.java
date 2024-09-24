@@ -1,6 +1,7 @@
 package com.mrd.server.services.impl;
 
 import com.mrd.server.dto.CategoryDto;
+import com.mrd.server.dto.CourseDto;
 import com.mrd.server.models.Category;
 import com.mrd.server.repositories.CategoryRepository;
 import com.mrd.server.services.CategoryService;
@@ -73,5 +74,36 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryDto> getAllCategoriesOrderByCreatedAt() {
         List<Category> categories = categoryRepository.findAllByOrderByCreatedAtDesc();
         return categories.stream().map(Category::getDto).collect(Collectors.toList());
+    }
+
+    public List<CategoryDto> getCategoriesWithCourses() {
+        List<Category> categories = categoryRepository.findAll();
+
+        // Convert Category entities to CategoryDto and include courses
+        return categories.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    private CategoryDto convertToDto(Category category) {
+        CategoryDto categoryDto = new CategoryDto();
+        categoryDto.setId(category.getId());
+        categoryDto.setName(category.getName());
+        categoryDto.setDescription(category.getDescription());
+        categoryDto.setImage(category.getImage());
+
+        // Convert courses and set them in the CategoryDto
+        if (category.getCourses() != null) {
+            categoryDto.setCourses(
+                    category.getCourses().stream().map(course -> {
+                        CourseDto courseDto = new CourseDto();
+                        courseDto.setId(course.getId());
+                        courseDto.setName(course.getName());
+                        courseDto.setDescription(course.getDescription());
+                        courseDto.setStartDateTime(course.getStartDateTime());
+                        return courseDto;
+                    }).collect(Collectors.toList())
+            );
+        }
+
+        return categoryDto;
     }
 }

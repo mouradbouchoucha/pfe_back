@@ -9,4 +9,6 @@ public class CenterDto {
     private String name;
     private String description;
     private String location;
+    private byte[] image;
+
 }

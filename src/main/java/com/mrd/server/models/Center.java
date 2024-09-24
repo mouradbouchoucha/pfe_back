@@ -1,10 +1,7 @@
 package com.mrd.server.models;
 
 import com.mrd.server.dto.CenterDto;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,6 +18,9 @@ public class Center {
     private String name;
     private String description;
     private String location;
+    @Lob
+    @Column(columnDefinition = "LONGBLOB", length = 1000000000)
+    private byte[] image;
 
     public CenterDto getDto() {
         CenterDto centerDto = new CenterDto();
@@ -28,7 +28,7 @@ public class Center {
         centerDto.setName(name);
         centerDto.setDescription(description);
         centerDto.setLocation(location);
-
+        centerDto.setImage(image);
         return centerDto;
     }
 }

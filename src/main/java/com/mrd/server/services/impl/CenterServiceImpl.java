@@ -18,7 +18,7 @@ public class CenterServiceImpl implements CenterService {
     private final CenterRepository centerRepository;
     @Override
     public CenterDto getCenter() {
-        Optional<Center> optionalCenter = centerRepository.findById(0L);
+        Optional<Center> optionalCenter = centerRepository.findById(1L);
         return optionalCenter.get().getDto();
     }
 

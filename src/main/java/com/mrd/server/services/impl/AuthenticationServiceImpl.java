@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.naming.AuthenticationException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -31,6 +32,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final TrainerRepository trainerRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final EmailService emailService;
+
     public User signUp(SignUpRequest signUpRequest) {
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
             throw new IllegalStateException("Email already taken");
@@ -69,17 +71,33 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     public JwtAuthenticationResponse signIn(SignInRequest signInRequest) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                signInRequest.getEmail(), signInRequest.getPassword()
-        ));
-        var user = userRepository.findByEmail(signInRequest.getEmail()).orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
-        var jwt = jwtService.generateToken(user);
-//        var refreshToken = jwtService.generateRefreshToken(new HashMap<>(),user);
-
         JwtAuthenticationResponse jwtAuthenticationResponse = new JwtAuthenticationResponse();
 
-        jwtAuthenticationResponse.setAccessToken(jwt);
-//        jwtAuthenticationResponse.setRefreshToken(refreshToken);
+        try {
+            // Fetch user by email
+            var user = userRepository.findByEmail(signInRequest.getEmail())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+
+            // Authenticate the user
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    signInRequest.getEmail(), signInRequest.getPassword()
+            ));
+
+            // Generate JWT token
+            var jwt = jwtService.generateToken(user);
+
+            // Set JWT token in response
+            jwtAuthenticationResponse.setAccessToken(jwt);
+
+        } catch (IllegalArgumentException e) {
+            // If email not found or invalid password
+            jwtAuthenticationResponse.setAccessToken(null); // No token
+            jwtAuthenticationResponse.setErrorMessage("Invalid email or password. Please try again.");
+        } catch (Exception e) {
+            // Generic error handling
+            jwtAuthenticationResponse.setAccessToken(null);
+            jwtAuthenticationResponse.setErrorMessage("An unexpected error occurred. Please try again later.");
+        }
 
         return jwtAuthenticationResponse;
     }

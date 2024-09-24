@@ -29,21 +29,29 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/auth/**")
-                        .permitAll()
-                        .requestMatchers("/api/users/**").hasAnyAuthority(Role.USER.name(), Role.ADMIN.name())
-                        .requestMatchers("/api/admin/**").hasAuthority(Role.ADMIN.name())
-                        .requestMatchers("/api/**").permitAll()
-                        .anyRequest().authenticated()
-                ).sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+//                .authorizeHttpRequests(
+//                        (requests) -> requests
+////                                .requestMatchers("/api/auth/**").permitAll()  // Public auth endpoints
+////                                .requestMatchers("/api/centers/**").permitAll()  // Public centers endpoints
+////                                .requestMatchers("/api/users/**").hasAnyAuthority(Role.USER.name(), Role.ADMIN.name())  // Role-based access
+////                                .requestMatchers("/api/admin/**").hasAuthority(Role.ADMIN.name())  // Admin-only access
+//                                .requestMatchers("/api/**").permitAll()  // Allow other public API requests
+//                                .anyRequest()
+//                                .authenticated()  // Any other request must be authenticated
+//                )
+                .authorizeRequests()
+                .requestMatchers("/api/centers/**").permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+               .requestMatchers("/error").permitAll()
+                .requestMatchers("/api/categories/courses").permitAll()
+                .requestMatchers("/api/**").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(
-                        jwtAuthentificationFilter,
-                        UsernamePasswordAuthenticationFilter.class
-                );
-        return http.build();
+                .addFilterBefore(jwtAuthentificationFilter, UsernamePasswordAuthenticationFilter.class);
 
+        return http.build();
     }
 
     @Bean
@@ -53,6 +61,7 @@ public class SecurityConfiguration {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -61,6 +70,5 @@ public class SecurityConfiguration {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
-
     }
 }

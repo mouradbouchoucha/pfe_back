@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
+
     private final AuthenticationService authenticationService;
     private final VerificationTokenRepository tokenRepository;
     private final UserRepository userRepository;
