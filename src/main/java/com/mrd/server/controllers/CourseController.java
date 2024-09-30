@@ -154,5 +154,9 @@ public class CourseController {
         return ResponseEntity.ok("Enrollment rejected");
     }
 
+    @GetMapping("/{courseId}/emails")
+    public List<String> getEmails(@PathVariable Long courseId) {
+        return courseService.getEmails(courseId);
+    }
 }
 

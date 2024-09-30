@@ -27,7 +27,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final TrainerRepository trainerRepository;
     private final CourseRepository courseRepository;
     private final SubjectRepository subjectRepository;
-    private final ResourceRepository resourceRepository;
 
     @Override
     public ScheduleDto createSchedule(ScheduleDto scheduleDTO, Long course_id) {
@@ -36,14 +35,13 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         Trainer trainer = trainerRepository.findById(scheduleDTO.getTrainer().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid trainer ID"));
+        Subject subject = subjectRepository.findById(scheduleDTO.getSubject().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid subject ID"));
 
-        Set<Subject> subjects = new HashSet<>();
-        if (scheduleDTO.getSubjects() != null) {
-            subjects = scheduleDTO.getSubjects().stream()
-                    .map(subjectDto -> subjectRepository.findById(subjectDto.getId())
-                            .orElseThrow(() -> new IllegalArgumentException("Invalid subject ID")))
-                    .collect(Collectors.toSet());
-        }
+//        if (scheduleDTO.getSubject() != null) {
+//            subject = scheduleDTO.getSubject();
+//                    ;
+//        }
 
         LocalDateTime startDateTime = scheduleDTO.getStartDateTime();
         LocalDateTime endDateTime = startDateTime.plusMinutes((long) (scheduleDTO.getDuration() * 60));
@@ -52,7 +50,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         BeanUtils.copyProperties(scheduleDTO, schedule);
         schedule.setCourse(course);
         schedule.setTrainer(trainer);
-        schedule.setSubjects(subjects);
+        schedule.setSubject(subject);
 //        schedule.setResource(resourceRepository.findById(1L).orElse(null));
         schedule.setStartDateTime(startDateTime);
 //        schedule.setEndDateTime(endDateTime);
@@ -135,9 +133,9 @@ public class ScheduleServiceImpl implements ScheduleService {
 //        if (schedule.getResource() != null) {
 //            scheduleDto.setResource(schedule.getResource().getDto());
 //        }
-        if (schedule.getSubjects() != null) {
+        if (schedule.getSubject() != null) {
             //to verify
-            scheduleDto.setSubjects(schedule.getSubjects().stream().collect(Collectors.toSet()).stream().map(Subject::getDto).collect(Collectors.toSet()));
+            scheduleDto.setSubject(schedule.getSubject().getDto());
         }
         if (schedule.getTrainer() != null) {
             scheduleDto.setTrainer(schedule.getTrainer().getDto());

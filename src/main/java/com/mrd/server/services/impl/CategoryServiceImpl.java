@@ -23,11 +23,14 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = new Category();
         category.setName(categoryDto.getName());
         category.setDescription(categoryDto.getDescription());
+        category.setImage(categoryDto.getImage());
+        //System.out.println(categoryDto.getImageFile());
+        System.out.println(categoryDto.getImage() == null);
 
-        if (categoryDto.getImageFile() != null) {
-            byte[] imageData = categoryDto.getImageFile().getBytes();
-            category.setImage(imageData);
-        }
+//        if (categoryDto.getImageFile() != null && !categoryDto.getImageFile().isEmpty()) {
+//            category.setImage(categoryDto.getImageFile().getBytes());
+//
+//        }
 
         return categoryRepository.save(category).getDto();
     }
@@ -50,8 +53,8 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(categoryDto.getDescription());
 
         // Check if image file is provided
-        if (categoryDto.getImageFile() != null) {
-            byte[] imageData = categoryDto.getImageFile().getBytes();
+        if (categoryDto.getImage() != null) {
+            byte[] imageData = categoryDto.getImage()   ;
             category.setImage(imageData);
         }
 

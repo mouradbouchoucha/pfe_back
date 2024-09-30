@@ -23,4 +23,5 @@ public interface TraineeService {
     TraineeDto getTraineeByEmail(String email);
 
     TraineeDto getTraineeById(Long id);
+
 }

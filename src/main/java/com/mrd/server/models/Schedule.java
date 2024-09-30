@@ -48,13 +48,10 @@ public class Schedule {
 
     private String location;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "schedule_subject",
-            joinColumns = @JoinColumn(name = "schedule_id"),
-            inverseJoinColumns = @JoinColumn(name = "subject_id")
-    )
-    private Set<Subject> subjects;
+    @ManyToOne
+    @JoinColumn(name = "subject_id", nullable = false)
+    @JsonManagedReference
+    private Subject subject;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "trainer_id", nullable = false)
@@ -119,7 +116,7 @@ public class Schedule {
         scheduleDto.setStartDateTime(startDateTime);
         scheduleDto.setDuration(duration);
         scheduleDto.setLocation(location);
-        scheduleDto.setSubjects(subjects.stream().map(Subject::getDto).collect(Collectors.toSet()));
+        scheduleDto.setSubject(subject.getDto());
         scheduleDto.setTrainer(trainer.getDto());
 //        scheduleDto.setResource(resource.getDto());
         System.out.println(scheduleDto);

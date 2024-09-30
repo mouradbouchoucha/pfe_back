@@ -3,10 +3,16 @@ package com.mrd.server.services.impl;
 
 import com.mrd.server.models.User;
 import com.mrd.server.services.EmailService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.util.List;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -27,5 +33,33 @@ public class EmailServiceImpl implements EmailService {
 
         mailSender.send(email);
     }
+
+    public void sendEmail(List<String> to, String subject, String text, File attachment) {
+        MimeMessage message = mailSender.createMimeMessage();
+
+        try {
+            // Create a helper to set up the message
+            MimeMessageHelper helper = new MimeMessageHelper(message, true); // true indicates multipart message
+            helper.setTo(to.toArray(new String[0]));
+            helper.setSubject(subject);
+            helper.setText(text, true); // true indicates that the text is in HTML format if needed
+
+            // Check if an attachment is provided
+            if (attachment != null && attachment.exists()) {
+                helper.addAttachment(attachment.getName(), attachment);
+            }
+
+            // Send the email
+            mailSender.send(message);
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            // Handle exception or log it
+        }
+    }
+
+//    public void sendEmail(List<String> to, String subject, String text) {
+//
+//    }
 }
 

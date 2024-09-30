@@ -24,7 +24,7 @@ public class Trainee extends User {
     @Column(columnDefinition = "LONGBLOB", length = 1000000000)
     private byte[] profilePicture;
 
-    @OneToMany(mappedBy = "trainee")
+    @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<EnrollmentRequest> enrollmentRequests;
 
@@ -32,7 +32,6 @@ public class Trainee extends User {
     @ManyToMany(mappedBy = "enrolledTrainees")
     @JsonManagedReference
     @ToString.Exclude
-
     private List<Course> enrolledCourses;
 
     @ManyToMany(mappedBy = "likedTrainees")

@@ -15,4 +15,6 @@ public interface CourseService {
     CourseDto updateCourse( CourseDto courseDTO) throws IOException;
 
     List<CourseDto> getAllCoursesOrderByCreatedAt();
+
+    List<String> getEmails(Long course_id);
 }

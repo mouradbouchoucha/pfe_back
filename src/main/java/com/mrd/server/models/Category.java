@@ -26,11 +26,12 @@ public class Category {
     private String name;
     @Column(columnDefinition = "LONGTEXT")
     private String description;
+
     @Lob
     @Column(columnDefinition = "LONGBLOB", length = 1000000000)
     private byte[] image;
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Course> courses;
 

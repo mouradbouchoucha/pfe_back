@@ -34,7 +34,7 @@ public class Course {
     @Column(columnDefinition = "LONGBLOB", length = 1000000000)
     private byte[] image;
 
-    @OneToMany(mappedBy = "course")
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Schedule> schedules;
 
@@ -52,8 +52,8 @@ public class Course {
     @JsonBackReference
     private List<Trainee> enrolledTrainees;
 
-    @OneToMany(mappedBy = "course")
-    @JsonManagedReference
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private List<EnrollmentRequest> enrollmentRequests;
 
     @ManyToMany

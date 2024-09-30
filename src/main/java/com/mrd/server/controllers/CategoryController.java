@@ -28,10 +28,11 @@ public class CategoryController {
         CategoryDto categoryDto = new CategoryDto();
         categoryDto.setName(name);
         categoryDto.setDescription(description);
-        if (imageFile != null) {
-            byte[] imageData = imageFile.getBytes();
-            categoryDto.setImage(imageData);
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            categoryDto.setImage(imageFile.getBytes()); // Convert to byte array
         }
+        //System.out.println(categoryDto );
         categoryService.createCategory(categoryDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryDto);
     }
@@ -64,7 +65,7 @@ public class CategoryController {
         categoryDto.setId(id);
         categoryDto.setName(name);
         categoryDto.setDescription(description);
-        categoryDto.setImageFile(imageFile);
+        categoryDto.setImage(imageFile.getBytes());
 
         CategoryDto updatedCategory = categoryService.updateCategory(categoryDto);
         return ResponseEntity.ok().body(updatedCategory);

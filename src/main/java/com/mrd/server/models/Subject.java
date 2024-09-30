@@ -1,5 +1,6 @@
 package com.mrd.server.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.mrd.server.dto.SubjectDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -22,8 +24,9 @@ public class Subject {
     private Long id;
     private String name;
 
-    @ManyToMany(mappedBy = "subjects")
-    private Set<Schedule> schedules;
+    @OneToMany(mappedBy = "subject")
+    @JsonBackReference
+    private List<Schedule> schedules;
 
     @Column(nullable = false, name = "created_at", updatable = false)
     private Timestamp createdAt;

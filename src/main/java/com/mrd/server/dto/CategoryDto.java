@@ -14,7 +14,7 @@ public class CategoryDto {
     private String description;
     private byte[] image;
 
-    public MultipartFile imageFile;
+//    public MultipartFile imageFile;
 
     private List<CourseDto> courses;
 }

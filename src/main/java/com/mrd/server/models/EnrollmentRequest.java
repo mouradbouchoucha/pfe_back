@@ -1,5 +1,7 @@
 package com.mrd.server.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,10 +17,12 @@ public class EnrollmentRequest {
 
     @ManyToOne
     @JoinColumn(name = "trainee_id", nullable = false)
+    @JsonBackReference
     private Trainee trainee;
 
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
+    @JsonBackReference
     private Course course;
 
     @Enumerated(EnumType.STRING)

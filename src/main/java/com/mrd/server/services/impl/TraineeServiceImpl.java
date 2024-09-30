@@ -148,4 +148,6 @@ public class TraineeServiceImpl implements TraineeService {
         }
         return null;
     }
+
+
 }

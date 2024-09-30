@@ -30,7 +30,7 @@ public class Trainer extends User {
     @Column(columnDefinition = "LONGBLOB", length = 1000000000)
     private byte[] profilePicture;
 
-    @OneToMany(mappedBy = "trainer")
+    @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Schedule> schedules;
 
