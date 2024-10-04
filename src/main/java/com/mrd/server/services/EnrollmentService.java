@@ -4,7 +4,7 @@ import com.mrd.server.dto.EnrollmentRequestDto;
 
 import java.util.List;
 
-public interface EnrollementService {
+public interface EnrollmentService {
     EnrollmentRequestDto createEnrollmentRequest(EnrollmentRequestDto enrollmentRequestDto);
     EnrollmentRequestDto approveEnrollmentRequest(Long id);
     List<EnrollmentRequestDto> getAllEnrollmentRequests();
@@ -17,4 +17,6 @@ public interface EnrollementService {
     List<EnrollmentRequestDto> getEnrollmentRequestsByTrainee(Long id);
 
     EnrollmentRequestDto rejectEnrollmentRequest(Long id);
+
+    boolean checkEnrollmentRequestExists(Long traineeId, Long courseId);
 }

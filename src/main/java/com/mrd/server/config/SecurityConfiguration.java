@@ -44,6 +44,8 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/auth/**").permitAll()
                .requestMatchers("/error").permitAll()
                 .requestMatchers("/api/categories/courses").permitAll()
+                .requestMatchers("/api/enrollment/**").permitAll()
+
                 .requestMatchers("/api/**").permitAll()
                 .anyRequest().authenticated()
                 .and()

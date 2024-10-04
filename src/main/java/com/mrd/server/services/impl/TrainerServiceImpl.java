@@ -55,7 +55,7 @@ public class TrainerServiceImpl implements TrainerService {
         Trainer trainer = trainerRepository.findById(trainerDto.getId())
                 .orElseThrow();
 
-       System.out.println("trainerDto: " + trainerDto);
+       //System.out.println("trainerDto: " + trainerDto);
        trainer.setFirstName(trainerDto.getFirstName());
         trainer.setLastName(trainerDto.getLastName());
         trainer.setEmail(trainerDto.getEmail());

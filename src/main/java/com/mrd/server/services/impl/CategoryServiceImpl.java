@@ -25,7 +25,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(categoryDto.getDescription());
         category.setImage(categoryDto.getImage());
         //System.out.println(categoryDto.getImageFile());
-        System.out.println(categoryDto.getImage() == null);
+       // System.out.println(categoryDto.getImage() == null);
 
 //        if (categoryDto.getImageFile() != null && !categoryDto.getImageFile().isEmpty()) {
 //            category.setImage(categoryDto.getImageFile().getBytes());

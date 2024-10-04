@@ -62,7 +62,7 @@ public class TraineeServiceImpl implements TraineeService {
     public TraineeDto updateTrainee(TraineeDto traineeDto) throws IOException {
         Trainee trainee = traineeRepository.findById(traineeDto.getId())
                 .orElseThrow();
-        System.out.println("traineeDto: " + traineeDto);
+        //System.out.println("traineeDto: " + traineeDto);
         trainee.setFirstName(traineeDto.getFirstName());
         trainee.setLastName(traineeDto.getLastName());
         trainee.setEmail(traineeDto.getEmail());

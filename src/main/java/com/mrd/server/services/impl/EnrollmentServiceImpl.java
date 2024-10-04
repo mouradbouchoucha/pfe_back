@@ -1,6 +1,9 @@
 package com.mrd.server.services.impl;
 
 import com.mrd.server.dto.EnrollmentRequestDto;
+import com.mrd.server.exceptions.EnrollmentRequestExistsException;
+import com.mrd.server.exceptions.EntityNotFoundException;
+import com.mrd.server.exceptions.TraineeAlreadyEnrolledException;
 import com.mrd.server.models.Course;
 import com.mrd.server.models.EnrollmentRequest;
 import com.mrd.server.models.Trainee;
@@ -8,18 +11,19 @@ import com.mrd.server.repositories.CourseRepository;
 import com.mrd.server.repositories.EnrollmentRequestRepository;
 import com.mrd.server.repositories.TraineeRepository;
 import com.mrd.server.services.EmailService;
-import com.mrd.server.services.EnrollementService;
+import com.mrd.server.services.EnrollmentService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class EnrollementServiceImpl implements EnrollementService {
+public class EnrollmentServiceImpl implements EnrollmentService {
 
     private final EnrollmentRequestRepository enrollmentRequestRepository;
     private final TraineeRepository traineeRepository;
@@ -31,9 +35,20 @@ public class EnrollementServiceImpl implements EnrollementService {
     public EnrollmentRequestDto createEnrollmentRequest(EnrollmentRequestDto enrollmentRequestDto) {
         // Fetch trainee and course
         Trainee trainee = traineeRepository.findById(enrollmentRequestDto.getTraineeId())
-                .orElseThrow(() -> new RuntimeException("Trainee not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Trainee not found"));
         Course course = courseRepository.findById(enrollmentRequestDto.getCourseId())
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Course not found"));
+
+        // Check if trainee is already enrolled in the course
+        if (course.getEnrolledTrainees().contains(trainee)) {
+            throw new TraineeAlreadyEnrolledException("Trainee is already enrolled in this course.");
+        }
+
+        // Check if there is already a pending or approved enrollment request
+        Optional<EnrollmentRequest> existingRequest = enrollmentRequestRepository.findByTraineeAndCourse(trainee, course);
+        if (existingRequest.isPresent()) {
+            throw new EnrollmentRequestExistsException("Trainee has already submitted an enrollment request for this course.");
+        }
 
         // Create new EnrollmentRequest
         EnrollmentRequest enrollmentRequest = new EnrollmentRequest();
@@ -45,14 +60,13 @@ public class EnrollementServiceImpl implements EnrollementService {
         EnrollmentRequest savedRequest = enrollmentRequestRepository.save(enrollmentRequest);
 
         // Send email to the trainee about the new request
-
         String subject = "Enrollment Request Created";
         String message = String.format("Dear %s, your enrollment request for the course %s has been successfully created.",
                 trainee.getFirstName() + " " + trainee.getLastName(), course.getName());
 
         List<String> recipients = new ArrayList<>();
         recipients.add(trainee.getEmail());
-        emailService.sendEmail(recipients, subject, message,null);
+        emailService.sendEmail(recipients, subject, message, null);
 
         // Convert to DTO
         EnrollmentRequestDto responseDto = new EnrollmentRequestDto();
@@ -62,6 +76,11 @@ public class EnrollementServiceImpl implements EnrollementService {
         responseDto.setStatus(savedRequest.getStatus().name());
 
         return responseDto;
+    }
+
+    @Override
+    public boolean checkEnrollmentRequestExists(Long traineeId, Long courseId) {
+        return enrollmentRequestRepository.existsByTraineeIdAndCourseId(traineeId, courseId);
     }
 
     @Override

@@ -45,7 +45,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
         LocalDateTime startDateTime = scheduleDTO.getStartDateTime();
         LocalDateTime endDateTime = startDateTime.plusMinutes((long) (scheduleDTO.getDuration() * 60));
-        System.out.println(startDateTime);
+        //System.out.println(startDateTime);
         Schedule schedule = new Schedule();
         BeanUtils.copyProperties(scheduleDTO, schedule);
         schedule.setCourse(course);

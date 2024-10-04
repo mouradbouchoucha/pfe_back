@@ -60,9 +60,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         verificationToken.setUser(savedUser);
         verificationToken.setExpiryDate(LocalDateTime.now().plusHours(24)); // Token valid for 24 hours
         verificationTokenRepository.save(verificationToken);
-        System.out.println("Verification token: " + verificationToken);
-        System.out.println("User: " + savedUser);
-        System.out.println("Token: " + token);
+//        System.out.println("Verification token: " + verificationToken);
+//        System.out.println("User: " + savedUser);
+//        System.out.println("Token: " + token);
         // Send verification email
         emailService.sendVerificationEmail(savedUser, token);
 
