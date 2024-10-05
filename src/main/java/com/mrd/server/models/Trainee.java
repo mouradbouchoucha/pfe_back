@@ -26,6 +26,7 @@ public class Trainee extends User {
 
     @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
+    @ToString.Exclude
     private List<EnrollmentRequest> enrollmentRequests;
 
 

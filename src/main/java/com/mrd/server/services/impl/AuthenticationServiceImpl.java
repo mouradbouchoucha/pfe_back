@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -66,6 +67,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Send verification email
         emailService.sendVerificationEmail(savedUser, token);
 
+        List<User> admins = userRepository.findAllByRole(Role.ADMIN);
+        //System.out.println(admins);
+        List<String> adminsEmails = admins.stream().map(User::getEmail).toList();
+        emailService.sendEmail(adminsEmails, "New user registered", "User " + savedUser.getFirstName() + " " + savedUser.getLastName() + " registered successfully.",null);
+
         return savedUser;
     }
 
@@ -98,6 +104,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             jwtAuthenticationResponse.setAccessToken(null);
             jwtAuthenticationResponse.setErrorMessage("An unexpected error occurred. Please try again later.");
         }
+
+        List<User> admins = userRepository.findAllByRole(Role.ADMIN);
+        System.out.println(admins);
 
         return jwtAuthenticationResponse;
     }

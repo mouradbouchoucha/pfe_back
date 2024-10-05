@@ -18,11 +18,13 @@ public class EnrollmentRequest {
     @ManyToOne
     @JoinColumn(name = "trainee_id", nullable = false)
     @JsonBackReference
+    @ToString.Exclude
     private Trainee trainee;
 
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
     @JsonBackReference
+    @ToString.Exclude
     private Course course;
 
     @Enumerated(EnumType.STRING)

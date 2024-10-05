@@ -4,12 +4,11 @@ import com.mrd.server.dto.EnrollmentRequestDto;
 import com.mrd.server.exceptions.EnrollmentRequestExistsException;
 import com.mrd.server.exceptions.EntityNotFoundException;
 import com.mrd.server.exceptions.TraineeAlreadyEnrolledException;
-import com.mrd.server.models.Course;
-import com.mrd.server.models.EnrollmentRequest;
-import com.mrd.server.models.Trainee;
+import com.mrd.server.models.*;
 import com.mrd.server.repositories.CourseRepository;
 import com.mrd.server.repositories.EnrollmentRequestRepository;
 import com.mrd.server.repositories.TraineeRepository;
+import com.mrd.server.repositories.UserRepository;
 import com.mrd.server.services.EmailService;
 import com.mrd.server.services.EnrollmentService;
 import jakarta.transaction.Transactional;
@@ -29,6 +28,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final TraineeRepository traineeRepository;
     private final CourseRepository courseRepository;
     private final EmailService emailService;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -64,9 +64,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         String message = String.format("Dear %s, your enrollment request for the course %s has been successfully created.",
                 trainee.getFirstName() + " " + trainee.getLastName(), course.getName());
 
-        List<String> recipients = new ArrayList<>();
-        recipients.add(trainee.getEmail());
-        emailService.sendEmail(recipients, subject, message, null);
+
 
         // Convert to DTO
         EnrollmentRequestDto responseDto = new EnrollmentRequestDto();
@@ -74,6 +72,14 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         responseDto.setTraineeId(trainee.getId());
         responseDto.setCourseId(course.getId());
         responseDto.setStatus(savedRequest.getStatus().name());
+
+        List<String> recipients = new ArrayList<>();
+        recipients.add(trainee.getEmail());
+        emailService.sendEmail(recipients, subject, message, null);
+
+        List<User> admins = userRepository.findAllByRole(Role.ADMIN);
+        List<String> adminEmails = admins.stream().map(User::getEmail).toList();
+        emailService.sendEmail(adminEmails, "Enrollment Request Created","Enrollment Request Created for course " + course.getName() + " by " + trainee.getFirstName() + " " + trainee.getLastName() , null);
 
         return responseDto;
     }
@@ -103,9 +109,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         String message = String.format("Dear %s, your enrollment for the course %s has been approved.",
                 trainee.getFirstName() + " " + trainee.getLastName(), course.getName());
 
-        List<String> recipients = new ArrayList<>();
-        recipients.add(trainee.getEmail());
-        emailService.sendEmail(recipients, subject, message,null);
+
 
         // Convert to DTO
         EnrollmentRequestDto responseDto = new EnrollmentRequestDto();
@@ -113,6 +117,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         responseDto.setTraineeId(updatedRequest.getTrainee().getId());
         responseDto.setCourseId(updatedRequest.getCourse().getId());
         responseDto.setStatus(updatedRequest.getStatus().name());
+
+        List<String> recipients = new ArrayList<>();
+        recipients.add(trainee.getEmail());
+        emailService.sendEmail(recipients, subject, message,null);
 
         return responseDto;
     }
@@ -129,17 +137,16 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
         // Save the updated request
         EnrollmentRequest updatedRequest = enrollmentRequestRepository.save(enrollmentRequest);
-
+        System.out.println("updatedRequest: " + updatedRequest);
         // Send rejection email to the trainee
         Trainee trainee = enrollmentRequest.getTrainee();
+
         Course course = enrollmentRequest.getCourse();
         String subject = "Enrollment Rejected";
         String message = String.format("Dear %s, your enrollment for the course %s has been rejected.",
                 trainee.getFirstName() + " " + trainee.getLastName(), course.getName());
 
-        List<String> recipients = new ArrayList<>();
-        recipients.add(trainee.getEmail());
-        emailService.sendEmail(recipients, subject, message,null);
+
 
         // Convert to DTO
         EnrollmentRequestDto responseDto = new EnrollmentRequestDto();
@@ -147,6 +154,10 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         responseDto.setTraineeId(updatedRequest.getTrainee().getId());
         responseDto.setCourseId(updatedRequest.getCourse().getId());
         responseDto.setStatus(updatedRequest.getStatus().name());
+
+        List<String> recipients = new ArrayList<>();
+        recipients.add(trainee.getEmail());
+        emailService.sendEmail(recipients, subject, message,null);
 
         return responseDto;
     }
