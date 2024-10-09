@@ -105,7 +105,7 @@ public class CourseServiceImpl implements CourseService {
                 }
             }
         }
-
+        System.out.println(emails);
         return emails;
     }
 }

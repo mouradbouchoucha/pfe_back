@@ -102,6 +102,8 @@ public class CategoryServiceImpl implements CategoryService {
                         courseDto.setName(course.getName());
                         courseDto.setDescription(course.getDescription());
                         courseDto.setStartDateTime(course.getStartDateTime());
+                        courseDto.setImage(course.getImage());
+
                         return courseDto;
                     }).collect(Collectors.toList())
             );

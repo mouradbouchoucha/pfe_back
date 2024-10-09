@@ -4,7 +4,9 @@ package com.mrd.server.services.impl;
 import com.mrd.server.models.User;
 import com.mrd.server.services.EmailService;
 import jakarta.mail.MessagingException;
+import jakarta.mail.SendFailedException;
 import jakarta.mail.internet.MimeMessage;
+import org.eclipse.angus.mail.smtp.SMTPAddressFailedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -37,7 +40,18 @@ public class EmailServiceImpl implements EmailService {
     public void sendEmail(List<String> to, String subject, String text, File attachment) {
         MimeMessage message = mailSender.createMimeMessage();
 
+        // Regex to validate email format (RFC 5321 basic compliance)
+        String emailRegex = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
+        Pattern emailPattern = Pattern.compile(emailRegex);
+
         try {
+            // Validate all email addresses
+            for (String recipient : to) {
+                if (!emailPattern.matcher(recipient).matches()) {
+                    throw new IllegalArgumentException("Invalid email address: " + recipient);
+                }
+            }
+
             // Create a helper to set up the message
             MimeMessageHelper helper = new MimeMessageHelper(message, true); // true indicates multipart message
             helper.setTo(to.toArray(new String[0]));
@@ -52,9 +66,15 @@ public class EmailServiceImpl implements EmailService {
             // Send the email
             mailSender.send(message);
 
+        } catch (IllegalArgumentException e) {
+            System.out.println("Failed to send email due to invalid address: " + e.getMessage());
+
+        } catch (SendFailedException e) {
+            // Handle SendFailedException, specifically for invalid addresses
+            System.out.println("Failed to send email: Invalid addresses. " + e.getMessage());
+
         } catch (MessagingException e) {
-            e.printStackTrace();
-            // Handle exception or log it
+            e.printStackTrace(); // Handle general messaging exceptions
         }
     }
 
