@@ -13,9 +13,13 @@ import com.mrd.server.services.EmailService;
 import com.mrd.server.services.EnrollmentService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +34,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final EmailService emailService;
     private final UserRepository userRepository;
 
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy 'at' hh:mm a");
+
+
     @Override
     @Transactional
     public EnrollmentRequestDto createEnrollmentRequest(EnrollmentRequestDto enrollmentRequestDto) {
@@ -38,7 +45,6 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 .orElseThrow(() -> new EntityNotFoundException("Trainee not found"));
         Course course = courseRepository.findById(enrollmentRequestDto.getCourseId())
                 .orElseThrow(() -> new EntityNotFoundException("Course not found"));
-
         // Check if trainee is already enrolled in the course
         if (course.getEnrolledTrainees().contains(trainee)) {
             throw new TraineeAlreadyEnrolledException("Trainee is already enrolled in this course.");
@@ -59,31 +65,48 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         // Save to the database
         EnrollmentRequest savedRequest = enrollmentRequestRepository.save(enrollmentRequest);
 
-        // Send email to the trainee about the new request
-        String subject = "Enrollment Request Created";
-        String message = String.format("Dear %s, your enrollment request for the course %s has been successfully created.",
-                trainee.getFirstName() + " " + trainee.getLastName(), course.getName());
-
-
-
-        // Convert to DTO
+        // Create response DTO
         EnrollmentRequestDto responseDto = new EnrollmentRequestDto();
         responseDto.setId(savedRequest.getId());
         responseDto.setTraineeId(trainee.getId());
         responseDto.setCourseId(course.getId());
         responseDto.setStatus(savedRequest.getStatus().name());
 
+
+
+        sendEmails(savedRequest);
+        return responseDto;
+    }
+
+    @Async
+    public void sendEmails(EnrollmentRequest enrollmentRequest) {
+        String subject = "Enrollment Request Created at ";
+        String message = String.format("Dear ,<br>Your enrollment request for the course <b>%s</b> has been successfully created.<br><br>" +
+                        "<b>Course Details</b><br>" +
+                        "Course Name: %s<br>" +
+                        "Description: %s<br>" +
+                        "Start Date: %s<br>" +
+                        "Duration: %s<br><br>" +
+                        "Regards,<br>" +
+                        "Mrd Team",
+//                Date.from(Instant.now()).toString(),
+                enrollmentRequest.getTrainee().getFirstName() + " " + enrollmentRequest.getTrainee().getLastName(),
+                enrollmentRequest.getCourse().getName(),
+                enrollmentRequest.getCourse().getName(),
+                enrollmentRequest.getCourse().getDescription(),
+                enrollmentRequest.getCourse().getStartDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                enrollmentRequest.getCourse().getDuration() + " Hour");
+
         List<String> recipients = new ArrayList<>();
-        recipients.add(trainee.getEmail());
+        recipients.add(enrollmentRequest.getTrainee().getEmail());
         emailService.sendEmail(recipients, subject, message, null);
 
         List<User> admins = userRepository.findAllByRole(Role.ADMIN);
         List<String> adminEmails = admins.stream().map(User::getEmail).toList();
-        emailService.sendEmail(adminEmails, "Enrollment Request Created","Enrollment Request Created for course " + course.getName() + " by " + trainee.getFirstName() + " " + trainee.getLastName() , null);
-
-        return responseDto;
+        String messageAdmin = String.format("Enrollment Request Created for course %s<br><br> by %s %s",
+                enrollmentRequest.getCourse().getName(), enrollmentRequest.getTrainee().getFirstName(), enrollmentRequest.getTrainee().getLastName());
+        emailService.sendEmail(adminEmails, "Enrollment Request Created", messageAdmin, null);
     }
-
     @Override
     public boolean checkEnrollmentRequestExists(Long traineeId, Long courseId) {
         return enrollmentRequestRepository.existsByTraineeIdAndCourseId(traineeId, courseId);

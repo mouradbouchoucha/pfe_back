@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -37,6 +38,7 @@ public class EmailServiceImpl implements EmailService {
         mailSender.send(email);
     }
 
+    @Async
     public void sendEmail(List<String> to, String subject, String text, File attachment) {
         MimeMessage message = mailSender.createMimeMessage();
 
